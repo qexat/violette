@@ -1,4 +1,4 @@
 (library
  (public_name violette-surface-term)
  (name surface_term)
- (libraries ansifmt violette-repr))
+ (libraries ansifmt violette-ext violette-repr))

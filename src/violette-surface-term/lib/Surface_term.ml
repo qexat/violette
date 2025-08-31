@@ -1,4 +1,4 @@
-open Ansifmt
+open Ext
 
 type expr =
   (* sorting: by precedence then lexicographically *)

@@ -2,4 +2,4 @@
  (public_name violette-error)
  (name error)
  (libraries ansifmt violette-core-term violette-core-term-normal-form
-  violette-repr violette-span violette-token-type))
+  violette-ext violette-repr violette-span violette-token-type))

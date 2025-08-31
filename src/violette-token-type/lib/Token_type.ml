@@ -1,4 +1,4 @@
-open Ansifmt
+open Ext
 
 type t =
   (* pairs *)

@@ -1,3 +1,5 @@
+open Ext
+
 type t =
   { path : string
   ; contents : string
@@ -6,7 +8,7 @@ type t =
 let create ~(path : string) ~(contents : string) : t =
   { path; contents }
 
-let repr { path : string; contents : string } : Ansifmt.Fmt.t =
+let repr { path : string; contents : string } : Fmt.t =
   Repr.record
     "File"
     [ ("path", Repr.string path)

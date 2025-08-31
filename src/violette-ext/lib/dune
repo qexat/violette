@@ -1,3 +1,4 @@
 (library
  (name ext)
- (public_name violette-ext))
+ (public_name violette-ext)
+ (libraries ansifmt))

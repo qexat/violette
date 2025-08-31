@@ -1,4 +1,4 @@
-open Ansifmt
+open Ext
 
 type t =
   { ty : Type.t
@@ -10,7 +10,7 @@ let repr { ty; span } : Fmt.t =
     "Error"
     [ ("ty", Type.repr ty); ("span", Span.repr span) ]
 
-open Ansi
+open Ansifmt.Ansi
 open Fmt
 
 let render { ty; span = _ } : Fmt.t =

@@ -1,4 +1,4 @@
 (library
  (public_name violette-file)
  (name file)
- (libraries ansifmt violette-repr))
+ (libraries ansifmt violette-ext violette-repr))

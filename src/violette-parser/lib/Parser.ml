@@ -1,4 +1,3 @@
-open Ansifmt
 open Ext
 
 type t =
