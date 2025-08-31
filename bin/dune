@@ -1,0 +1,4 @@
+(executable
+ (public_name violette)
+ (name main)
+ (libraries violette-toplevel))

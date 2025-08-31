@@ -1,0 +1,4 @@
+(library
+ (public_name violette-core-term-normal-form)
+ (name core_term_normal_form)
+ (libraries ansifmt violette-core-term violette-ext violette-repr))

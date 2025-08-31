@@ -1,0 +1,4 @@
+(test
+ (name test_violette_parser)
+ (libraries ansifmt violette-error violette-ext violette-file violette-repr
+  violette-surface-term violette-token violette-token-type))

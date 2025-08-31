@@ -1,0 +1,4 @@
+(library
+ (public_name violette-lowering)
+ (name lowering)
+ (libraries violette-core-term violette-curry violette-surface-term))

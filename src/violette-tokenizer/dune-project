@@ -1,0 +1,25 @@
+(lang dune 3.20)
+
+(name violette-tokenizer)
+
+(generate_opam_files true)
+
+(source
+ (github qexat/violette))
+
+(authors "lexa <hello@lexa.qexat.com>")
+
+(maintainers "lexa <hello@lexa.qexat.com>")
+
+(license MIT)
+
+(documentation https://qexat.github.io/violette)
+
+(package
+ (name violette-tokenizer)
+ (synopsis "The tokenizer for Violette")
+ (description
+  "violette-tokenizer provides a lexical analyzer for the Violette programming language.")
+ (depends
+  (ocaml
+   (>= 5.3))))

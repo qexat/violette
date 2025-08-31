@@ -1,0 +1,3 @@
+(library
+ (name ext)
+ (public_name violette-ext))

@@ -1,0 +1,4 @@
+(library
+ (public_name violette-token-type)
+ (name token_type)
+ (libraries ansifmt violette-repr))

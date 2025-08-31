@@ -1,0 +1,27 @@
+(lang dune 3.20)
+
+(name violette-curry)
+
+(generate_opam_files true)
+
+(source
+ (github qexat/violette))
+
+(authors "lexa <hello@lexa.qexat.com>")
+
+(maintainers "lexa <hello@lexa.qexat.com>")
+
+(license MIT)
+
+(documentation "https://qexat.github.io/violette")
+
+(package
+ (name violette-curry)
+ (synopsis "A small library for currying")
+ (description
+  "violette-curry is a small toolbox used by the Violette programming language to support currying.")
+ (depends
+  (ocaml
+   (>= 5.3)))
+ (tags
+  (currying toolbox violette)))

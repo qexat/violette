@@ -1,0 +1,4 @@
+(library
+ (public_name violette-span)
+ (name span)
+ (libraries ansifmt violette-file violette-repr))

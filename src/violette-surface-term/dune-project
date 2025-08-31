@@ -1,0 +1,25 @@
+(lang dune 3.20)
+
+(name violette-surface-term)
+
+(generate_opam_files true)
+
+(source
+ (github qexat/violette))
+
+(authors "lexa <hello@lexa.qexat.com>")
+
+(maintainers "lexa <hello@lexa.qexat.com>")
+
+(license MIT)
+
+(documentation https://qexat.github.io/violette)
+
+(package
+ (name violette-surface-term)
+ (synopsis "The AST of Violette")
+ (description
+  "violette-surface-term provides an abstract term language that is the closest to the source of a Violette program.")
+ (depends
+  (ocaml
+   (>= 5.3))))

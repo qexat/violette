@@ -1,0 +1,25 @@
+(lang dune 3.20)
+
+(name violette-span)
+
+(generate_opam_files true)
+
+(source
+ (github qexat/violette))
+
+(authors "lexa <hello@lexa.qexat.com>")
+
+(maintainers "lexa <hello@lexa.qexat.com>")
+
+(license MIT)
+
+(documentation https://qexat.github.io/violette)
+
+(package
+ (name violette-span)
+ (synopsis "A type to represent a portion of Violette code")
+ (description
+  "violette-span provides a data type that represents a range in a Violette source file.")
+ (depends
+  (ocaml
+   (>= 5.3))))

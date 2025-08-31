@@ -1,0 +1,4 @@
+(test
+ (name test_violette_tokenizer)
+ (libraries ansifmt violette-error violette-file violette-repr violette-token
+  violette-token-type))

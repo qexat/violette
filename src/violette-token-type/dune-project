@@ -1,0 +1,27 @@
+(lang dune 3.20)
+
+(name violette-token-type)
+
+(generate_opam_files true)
+
+(source
+ (github qexat/violette))
+
+(authors "lexa <hello@lexa.qexat.com>")
+
+(maintainers "lexa <hello@lexa.qexat.com>")
+
+(license MIT)
+
+(documentation https://qexat.github.io/violette)
+
+(package
+ (name violette-token-type)
+ (synopsis "A type for Violette's token types")
+ (description
+  "violette-token-type provides a data structure that represents the type of tokens used by Violette's lexical analyzer.")
+ (depends
+  (ocaml
+   (>= 5.3))
+  (ansifmt
+   (>= 1.0.0~pre2))))
