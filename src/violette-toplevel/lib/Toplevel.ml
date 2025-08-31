@@ -5,6 +5,9 @@ type t =
   { mutable env : Core_term_normal_form.t Env.t
   ; mutable prompt_in : Fmt.t
   ; mutable prompt_out : Fmt.t
+  ; mutable prompt_err : Fmt.t
+  ; mutable banner_start : Fmt.t
+  ; mutable banner_end : Fmt.t
   }
 
 type state =
@@ -41,11 +44,20 @@ end
 let create
       ?(prompt_in = Defaults.prompt_in)
       ?(prompt_out = Defaults.prompt_out)
+      ?(prompt_err = Defaults.prompt_err)
+      ?(banner_start = Defaults.banner_start)
+      ?(banner_end = Defaults.banner_end)
       ?(env = [])
       ()
   : t
   =
-  { env; prompt_in; prompt_out }
+  { env
+  ; prompt_in
+  ; prompt_out
+  ; prompt_err
+  ; banner_start
+  ; banner_end
+  }
 
 let get_channel : [ `Out | `Err ] -> out_channel = function
   | `Out -> stdout
@@ -106,9 +118,9 @@ let eval (source : string) (toplevel : t)
   toplevel.env <- interpreter.env;
   Ok value
 
-let setup (_ : t) =
+let setup (toplevel : t) : unit =
   Out_channel.set_buffered stderr false;
-  print_endline "Violette -- ctrl+d to quit"
+  Fmt.print toplevel.banner_start
 
 let rec loop (toplevel : t) =
   match listen toplevel with
@@ -120,10 +132,7 @@ let rec loop (toplevel : t) =
     loop toplevel
 
 let teardown (toplevel : t) =
-  respond
-    Fmt.(
-      stylize (raw "goodbye!") (`Foreground Ansi.Color.yellow))
-    toplevel;
+  respond toplevel.banner_end toplevel;
   Out_channel.set_buffered stderr true
 
 let run (toplevel : t) =
