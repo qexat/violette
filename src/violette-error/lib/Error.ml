@@ -10,4 +10,12 @@ let repr { ty; span } : Fmt.t =
     "Error"
     [ ("ty", Type.repr ty); ("span", Span.repr span) ]
 
+open Ansi
+open Fmt
+
+let render { ty; span = _ } : Fmt.t =
+  stylize (raw "error:") (`Foreground Color.red & `Bold)
+  ++ raw " "
+  ++ Type.synopsis ty
+
 module Type = Type

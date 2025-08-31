@@ -100,7 +100,7 @@ let print_value (value : Core_term_normal_form.t) (toplevel : t)
 
 let print_error (error : Error.t) (toplevel : t) : unit =
   (* todo: properly render the error *)
-  respond ~channel_type:`Err (Error.repr error) toplevel
+  respond ~channel_type:`Err (Error.render error) toplevel
 
 let eval (source : string) (toplevel : t)
   : (Core_term_normal_form.t, Error.t) result
