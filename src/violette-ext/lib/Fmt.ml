@@ -13,10 +13,11 @@ let raw (contents : string) : t = Raw contents
 let stylize (fmt : t) (styling : Ansi.t) : t =
   Stylized (fmt, styling)
 
-let join ~(on : t) (fmts : t list) : t = Join (on, fmts)
+let join ?(on : t = Raw " ") (fmts : t list) : t =
+  Join (on, fmts)
+
 let section (fmt : t) : t = Section fmt
 let concat (fmts : t list) = join ~on:(raw "") fmts
-let concat_words (fmts : t list) = join ~on:(raw " ") fmts
 let ( ++ ) (left : t) (right : t) : t = concat [ left; right ]
 
 let rec render ~(with_styling : bool) (fmt : t) : string =

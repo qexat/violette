@@ -58,7 +58,7 @@ let application (func : Fmt.t) (args : Fmt.t list) : Fmt.t =
 
 let block (expressions : Fmt.t list) : Fmt.t =
   match expressions with
-  | [] -> concat_words [ punctuation "{"; punctuation "}" ]
+  | [] -> join [ punctuation "{"; punctuation "}" ]
   | first :: rest ->
     concat
       [ raw "\n"
@@ -72,15 +72,11 @@ let block (expressions : Fmt.t list) : Fmt.t =
 
 let func (params : string list) (body : Fmt.t) : Fmt.t =
   keyword "\\"
-  ++ concat_words
-       [ concat_words (List.map parameter params)
-       ; operator "->"
-       ; body
-       ]
+  ++ join
+       [ join (List.map parameter params); operator "->"; body ]
 
 let let_definition (name : string) (body : Fmt.t) : Fmt.t =
-  concat_words
-    [ keyword "let"; identifier name; operator "="; body ]
+  join [ keyword "let"; identifier name; operator "="; body ]
 
 (* OCaml specific *)
 
@@ -90,7 +86,7 @@ let field_name (name : string) : Fmt.t =
   stylize (raw name) (`Foreground Color.blue)
 
 let field (name : string) (value : Fmt.t) : Fmt.t =
-  concat_words [ field_name name; operator "="; value ]
+  join [ field_name name; operator "="; value ]
 
 let field_list (fields : (string * Fmt.t) list) : Fmt.t =
   fields
