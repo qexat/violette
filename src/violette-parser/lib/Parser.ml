@@ -192,5 +192,6 @@ and parse_atom (parser : t)
               (int_of_string (get_lexeme parser token))))
     | None ->
       (match expect parser Identifier_lowercase with
-       | Error error -> Error error
+       | Error _ ->
+         Error (make_error Expected_expression parser)
        | Ok token -> Ok (Variable (get_lexeme parser token))))
