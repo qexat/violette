@@ -24,16 +24,18 @@ module Defaults = struct
   let prompt_out : Fmt.t =
     stylize (raw ">>>") (`Foreground Color.blue & `Bold)
 
+  let prompt_err : Fmt.t =
+    stylize (raw ">>>") (`Foreground Color.red & `Bold)
+
   let banner_start : Fmt.t =
     join
       ~on:(raw " ")
       [ stylize
-          (raw "violette")
+          (raw "Violette")
           (`Bold & `Foreground Color.magenta)
       ; stylize (raw "--") `Dim
-      ; stylize
-          (raw "ctrl+d")
-          (`Foreground Color.yellow & `Reverse)
+      ; stylize (raw " Ctrl ") `Reverse
+      ; stylize (raw " D ") `Reverse
       ; raw "to quit"
       ]
 
