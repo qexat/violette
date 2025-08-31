@@ -40,7 +40,7 @@ module Defaults = struct
       ]
 
   let banner_end : Fmt.t =
-    stylize (raw "goodbye!") (`Foreground Color.yellow)
+    stylize (raw "Goodbye!") (`Foreground Color.yellow)
 end
 
 let create
@@ -154,7 +154,7 @@ let rec loop (toplevel : t) =
     loop toplevel
 
 let teardown (toplevel : t) =
-  respond toplevel.banner_end toplevel;
+  Fmt.print toplevel.banner_end;
   Out_channel.set_buffered stderr true
 
 let run (toplevel : t) =
