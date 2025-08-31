@@ -66,7 +66,7 @@ let rec consume_while
 
 (* errors *)
 
-let make_error (tokenizer : t) (error_type : Error.Type.t)
+let make_error (error_type : Error.Type.t) (tokenizer : t)
   : Error.t
   =
   { ty = error_type
@@ -107,7 +107,7 @@ let tokenize_hexadecimal_literal (tokenizer : t)
 
 let rec scan (tokenizer : t) : (Token_type.t, Error.t) result =
   match consume tokenizer with
-  | None -> Error (make_error tokenizer Unexpected_end_of_file)
+  | None -> Error (make_error Unexpected_end_of_file tokenizer)
   | Some ("\n" | "\r" | "\t" | " ") ->
     to_next tokenizer;
     scan tokenizer
@@ -123,7 +123,7 @@ let rec scan (tokenizer : t) : (Token_type.t, Error.t) result =
        advance tokenizer;
        Ok Arrow_right
      | _ ->
-       Error (make_error tokenizer (Unrecognized_token "-")))
+       Error (make_error (Unrecognized_token "-") tokenizer))
   | Some ";" -> Ok Semicolon
   | Some "0" ->
     (match peek tokenizer with
@@ -137,15 +137,15 @@ let rec scan (tokenizer : t) : (Token_type.t, Error.t) result =
        ->
        Error
          (make_error
-            tokenizer
-            (Numeric_literal_cannot_have_a_leading_zero grapheme))
+            (Numeric_literal_cannot_have_a_leading_zero grapheme)
+            tokenizer)
      | _ -> Ok Decimal_numeric_literal)
   | Some grapheme when Predicates.is_decimal_digit grapheme ->
     tokenize_plain_numeric_literal tokenizer
   | Some grapheme when Predicates.starts_identifier grapheme ->
     tokenize_identifier_lowercase_or_keyword tokenizer
   | Some grapheme ->
-    Error (make_error tokenizer (Unrecognized_token grapheme))
+    Error (make_error (Unrecognized_token grapheme) tokenizer)
 
 let rec tokenize (tokenizer : t)
   : (Token.t list, Error.t) result

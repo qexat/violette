@@ -51,7 +51,7 @@ let consume (parser : t) : Token.t option =
   advance parser;
   Some token
 
-let make_error (parser : t) (error_type : Error.Type.t)
+let make_error (error_type : Error.Type.t) (parser : t)
   : Error.t
   =
   { ty = error_type
@@ -75,10 +75,10 @@ let expect
   | _ ->
     Error
       (make_error
-         parser
          (Option.value
             error_type
-            ~default:(Expected_token token_type)))
+            ~default:(Expected_token token_type))
+         parser)
 
 let rec expect_one_of (parser : t) (types : Token_type.t list)
   : Token.t option
@@ -121,7 +121,7 @@ and parse_function (parser : t)
   else (
     match parse_params parser with
     | [] ->
-      Error (make_error parser Expected_parameter_in_lambda)
+      Error (make_error Expected_parameter_in_lambda parser)
     | params ->
       let*! _ = expect parser Arrow_right in
       let*! body = parse_apply parser in
@@ -175,7 +175,7 @@ and parse_atom (parser : t)
   then
     if matches parser Paren_right
     then Ok Unit
-    else Error (make_error parser Unmatched_parenthesis)
+    else Error (make_error Unmatched_parenthesis parser)
   else (
     match
       expect_one_of
