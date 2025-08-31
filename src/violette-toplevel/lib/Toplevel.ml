@@ -85,16 +85,25 @@ let get_channel : [ `Out | `Err ] -> out_channel = function
   | `Out -> stdout
   | `Err -> stderr
 
+let get_prompt
+      (state : state)
+      (channel_type : [ `Out | `Err ])
+      (toplevel : t)
+  : Fmt.t
+  =
+  match state with
+  | `Listening -> toplevel.prompt_in
+  | `Responding ->
+    (match channel_type with
+     | `Out -> toplevel.prompt_out
+     | `Err -> toplevel.prompt_err)
+
 let print_prompt
       ~(state : state)
       (channel_type : [ `Out | `Err ])
       (toplevel : t)
   =
-  let prompt =
-    match state with
-    | `Listening -> toplevel.prompt_in
-    | `Responding -> toplevel.prompt_out
-  in
+  let prompt = get_prompt state channel_type toplevel in
   let out = get_channel channel_type in
   Fmt.print ~out ~ending:(Some " ") prompt
 
