@@ -61,6 +61,26 @@ let create
   ; banner_end
   }
 
+let repr
+      { env = _
+      ; prompt_in
+      ; prompt_out
+      ; prompt_err
+      ; banner_start
+      ; banner_end
+      }
+  : Fmt.t
+  =
+  Repr.record
+    "Toplevel"
+    [ ("env", Repr.opaque "env")
+    ; ("prompt_in", prompt_in)
+    ; ("prompt_out", prompt_out)
+    ; ("prompt_err", prompt_err)
+    ; ("banner_start", banner_start)
+    ; ("banner_end", banner_end)
+    ]
+
 let get_channel : [ `Out | `Err ] -> out_channel = function
   | `Out -> stdout
   | `Err -> stderr
