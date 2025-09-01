@@ -28,9 +28,8 @@ let repr : t -> Fmt.t = function
   | Lambda -> Repr.keyword "\\"
   | Arrow_right -> Repr.operator "->"
   | Let -> Repr.keyword "let"
-  | Identifier_lowercase -> Repr.type_name "<identifier>"
+  | Identifier_lowercase -> Repr.opaque "identifier"
   | Binary_numeric_literal
   | Decimal_numeric_literal
-  | Hexadecimal_numeric_literal ->
-    Repr.type_name "<numeric literal>"
+  | Hexadecimal_numeric_literal -> Repr.opaque "numeric literal"
   | Semicolon -> Repr.punctuation ";"
