@@ -66,15 +66,6 @@ let rec eval (term : Core_term.t) (interpreter : t)
   | Unit -> Some Unit
   | Variable name -> fetch_variable name interpreter
 
-and eval_scoped
-      (term : Core_term.t)
-      (env : Core_term.t Normal_form_poly.t Env.t)
-      (interpreter : t)
-  : Core_term.t Normal_form_poly.t option
-  =
-  let subinterpreter = fork ~with_env:env interpreter in
-  eval term subinterpreter
-
 and apply_function
       (func : Core_term.t Normal_form_poly.t)
       (arg : Core_term.t Normal_form_poly.t)
