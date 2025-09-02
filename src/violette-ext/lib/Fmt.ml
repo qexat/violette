@@ -6,7 +6,6 @@ type t =
   | Raw of string
   | Stylized of t * Ansi.t
   | Join of t * t list
-  | Section of t
 
 let raw (contents : string) : t = Raw contents
 
@@ -16,7 +15,6 @@ let stylize (fmt : t) (styling : Ansi.t) : t =
 let join ?(on : t = Raw " ") (fmts : t list) : t =
   Join (on, fmts)
 
-let section (fmt : t) : t = Section fmt
 let concat (fmts : t list) = join ~on:(raw "") fmts
 let ( ++ ) (left : t) (right : t) : t = concat [ left; right ]
 
@@ -31,8 +29,6 @@ let rec render ~(with_styling : bool) (fmt : t) : string =
     fmts
     |> List.map (render ~with_styling)
     |> String.concat (render ~with_styling on)
-  (* TODO: break lines on sections *)
-  | Section fmt -> render ~with_styling fmt
 
 let print
       ?(out = stdout)
