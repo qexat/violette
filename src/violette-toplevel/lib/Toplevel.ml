@@ -2,7 +2,7 @@ open Ansifmt
 open Ext
 
 type t =
-  { mutable env : Core_term.t Normal_form_poly.t Env.t
+  { mutable env : Core_term.t Normal_form.t Env.t
   ; doctor : Doctor.t
   ; mutable prompt_in : Fmt.t
   ; mutable prompt_out : Fmt.t
@@ -130,11 +130,11 @@ let respond
   Fmt.print ~out message
 
 let print_value
-      (value : Core_term.t Normal_form_poly.t)
+      (value : Core_term.t Normal_form.t)
       (toplevel : t)
   : unit
   =
-  respond (Normal_form_poly.repr value) toplevel
+  respond (Normal_form.repr value) toplevel
 
 let report_errors (toplevel : t) : unit =
   let review = Doctor.review ~mode:`Toplevel toplevel.doctor in
@@ -144,7 +144,7 @@ let report_errors (toplevel : t) : unit =
     review.details
 
 let eval (source : string) (toplevel : t)
-  : Core_term.t Normal_form_poly.t option
+  : Core_term.t Normal_form.t option
   =
   let file = File.create ~path:"<toplevel>" ~contents:source in
   let tokenizer = Tokenizer.create toplevel.doctor file in

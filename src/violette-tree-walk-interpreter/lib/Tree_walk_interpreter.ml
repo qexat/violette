@@ -4,15 +4,14 @@ open Diagnostic
 type t =
   { doctor : Doctor.t
   ; file : File.t
-  ; mutable env : Core_term.t Normal_form_poly.t Env.t
+  ; mutable env : Core_term.t Normal_form.t Env.t
   }
 
 let create ?(env = []) (doctor : Doctor.t) (file : File.t) : t =
   { doctor; file; env }
 
 let fork
-      ?with_env:
-        (env : Core_term.t Normal_form_poly.t Env.t option)
+      ?with_env:(env : Core_term.t Normal_form.t Env.t option)
       (interpreter : t)
   : t
   =
@@ -35,20 +34,20 @@ let add_error (error : Error.t) (interpreter : t) : unit =
     interpreter.doctor
 
 let fetch_variable (name : string) (interpreter : t)
-  : Core_term.t Normal_form_poly.t option
+  : Core_term.t Normal_form.t option
   =
   Env.fetch name interpreter.env
 
 let set_variable
       (name : string)
-      (value : Core_term.t Normal_form_poly.t)
+      (value : Core_term.t Normal_form.t)
       (interpreter : t)
   : unit
   =
   interpreter.env <- (name, value) :: interpreter.env
 
 let rec eval (term : Core_term.t) (interpreter : t)
-  : Core_term.t Normal_form_poly.t option
+  : Core_term.t Normal_form.t option
   =
   match term with
   | Apply (func, arg) ->
@@ -67,10 +66,10 @@ let rec eval (term : Core_term.t) (interpreter : t)
   | Variable name -> fetch_variable name interpreter
 
 and apply_function
-      (func : Core_term.t Normal_form_poly.t)
-      (arg : Core_term.t Normal_form_poly.t)
+      (func : Core_term.t Normal_form.t)
+      (arg : Core_term.t Normal_form.t)
       (interpreter : t)
-  : Core_term.t Normal_form_poly.t option
+  : Core_term.t Normal_form.t option
   =
   match func with
   | Closure (env, param, body) ->

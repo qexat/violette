@@ -2,7 +2,7 @@
 opam-version: "2.0"
 synopsis: "A generic normal form for Violette runtime values"
 description:
-  "violette-normal-form-poly provides a template normal form for various Violette interpreters."
+  "violette-normal-form provides a template normal form for various Violette interpreters."
 maintainer: ["lexa <hello@lexa.qexat.com>"]
 authors: ["lexa <hello@lexa.qexat.com>"]
 license: "MIT"

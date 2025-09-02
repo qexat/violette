@@ -1,6 +1,6 @@
 (lang dune 3.20)
 
-(name violette-normal-form-poly)
+(name violette-normal-form)
 
 (generate_opam_files true)
 
@@ -16,10 +16,10 @@
 (documentation https://qexat.github.io/violette)
 
 (package
- (name violette-normal-form-poly)
+ (name violette-normal-form)
  (synopsis "A generic normal form for Violette runtime values")
  (description
-  "violette-normal-form-poly provides a template normal form for various Violette interpreters.")
+  "violette-normal-form provides a template normal form for various Violette interpreters.")
  (depends
   (ocaml
    (>= 5.3))))

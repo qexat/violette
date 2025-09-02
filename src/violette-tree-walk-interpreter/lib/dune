@@ -2,4 +2,4 @@
  (public_name violette-tree-walk-interpreter)
  (name tree_walk_interpreter)
  (libraries ansifmt violette-core-term violette-diagnostic violette-doctor
-  violette-ext violette-normal-form-poly violette-file violette-span))
+  violette-ext violette-normal-form violette-file violette-span))

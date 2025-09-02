@@ -14,7 +14,7 @@ type t =
   | Unmatched_brace of Span.t
   | Unmatched_parenthesis of Span.t
   (* --- interpretation --- *)
-  | Illegal_application of Core_term.t Normal_form_poly.t
+  | Illegal_application of Core_term.t Normal_form.t
   | Unbound_variable of string
 
 let repr (_ : t) : Fmt.t = Repr.opaque "error"
@@ -48,7 +48,7 @@ let synopsis (error : t) : Fmt.t =
   | Illegal_application func ->
     Fmt.join
       [ Repr.text "illegal application of"
-      ; Normal_form_poly.repr func
+      ; Normal_form.repr func
       ]
   | Unbound_variable name ->
     Fmt.join

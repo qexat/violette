@@ -1,4 +1,4 @@
 (library
- (public_name violette-normal-form-poly)
- (name normal_form_poly)
+ (public_name violette-normal-form)
+ (name normal_form)
  (libraries ansifmt violette-ext violette-repr))

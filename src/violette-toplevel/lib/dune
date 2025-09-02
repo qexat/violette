@@ -2,5 +2,5 @@
  (public_name violette-toplevel)
  (name toplevel)
  (libraries ansifmt violette-doctor violette-diagnostic violette-ext
-  violette-file violette-lowering violette-normal-form-poly violette-parser
+  violette-file violette-lowering violette-normal-form violette-parser
   violette-repr violette-tokenizer violette-tree-walk-interpreter))
