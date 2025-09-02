@@ -82,6 +82,13 @@ let let_definition (name : string) (body : Fmt.t) : Fmt.t =
 
 let int (value : int) : Fmt.t = numeric (Int.to_string value)
 
+let tuple (values : Fmt.t list) : Fmt.t =
+  concat
+    [ punctuation "("
+    ; join ~on:(concat [ punctuation ","; raw " " ]) values
+    ; punctuation ")"
+    ]
+
 let field_name (name : string) : Fmt.t =
   stylize (raw name) (`Foreground Color.blue)
 
