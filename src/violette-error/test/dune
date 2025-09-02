@@ -1,3 +1,0 @@
-(test
- (name test_violette_error)
- (libraries ansifmt violette-file violette-repr))

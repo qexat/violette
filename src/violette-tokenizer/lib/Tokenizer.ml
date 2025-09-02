@@ -1,19 +1,27 @@
 open Ext
+open Diagnostic
 
 type t =
-  { file : File.t
+  { doctor : Doctor.t
+  ; file : File.t
   ; mutable start : int
   ; mutable current : int
   ; tokens : Token.t Dynarray.t
   }
 
-let create (file : File.t) : t =
-  { file; start = 0; current = 0; tokens = Dynarray.create () }
+let create (doctor : Doctor.t) (file : File.t) : t =
+  { doctor
+  ; file
+  ; start = 0
+  ; current = 0
+  ; tokens = Dynarray.create ()
+  }
 
-let repr { file; start; current; tokens } : Fmt.t =
+let repr { doctor = _; file; start; current; tokens } : Fmt.t =
   Repr.record
     "Tokenizer"
-    [ ("file", File.repr file)
+    [ ("doctor", Repr.opaque "doctor")
+    ; ("file", File.repr file)
     ; ("start", Repr.int start)
     ; ("current", Repr.int current)
     ; ( "tokens"
@@ -21,11 +29,16 @@ let repr { file; start; current; tokens } : Fmt.t =
           (tokens |> Dynarray.to_list |> List.map Token.repr) )
     ]
 
-let get_lexeme (tokenizer : t) : string =
-  String.sub
-    tokenizer.file.contents
+let get_lexeme (offset : int) (length : int) (tokenizer : t)
+  : string
+  =
+  String.sub tokenizer.file.contents offset length
+
+let get_lexeme_current (tokenizer : t) : string =
+  get_lexeme
     tokenizer.start
     (tokenizer.current - tokenizer.start)
+    tokenizer
 
 let is_at_end (tokenizer : t) : bool =
   tokenizer.current >= String.length tokenizer.file.contents
@@ -65,65 +78,66 @@ let rec consume_while
 
 (* errors *)
 
-let make_error (error_type : Error.Type.t) (tokenizer : t)
-  : Error.t
-  =
-  { ty = error_type
-  ; span =
-      Span.from_offset
-        tokenizer.file
-        tokenizer.start
-        tokenizer.current
-  }
+let error (error : Error.t) (tokenizer : t) : unit =
+  Doctor.add_error
+    error
+    (Span.from_offset
+       tokenizer.file
+       tokenizer.start
+       tokenizer.current)
+    tokenizer.doctor
 
 (* specialized functions *)
 
 let tokenize_identifier_lowercase_or_keyword (tokenizer : t)
-  : (Token_type.t, Error.t) result
+  : Token_type.t option
   =
   consume_while tokenizer Predicates.is_identifier;
-  match get_lexeme tokenizer with
-  | "let" -> Ok Let
-  | _ -> Ok Identifier_lowercase
+  match get_lexeme_current tokenizer with
+  | "let" -> Some Let
+  | _ -> Some Identifier_lowercase
 
 let tokenize_plain_numeric_literal (tokenizer : t)
-  : (Token_type.t, Error.t) result
+  : Token_type.t option
   =
   consume_while tokenizer Predicates.is_decimal_digit;
-  Ok Decimal_numeric_literal
+  Some Decimal_numeric_literal
 
 let tokenize_binary_literal (tokenizer : t)
-  : (Token_type.t, Error.t) result
+  : Token_type.t option
   =
   consume_while tokenizer Predicates.is_binary_digit;
-  Ok Binary_numeric_literal
+  Some Binary_numeric_literal
 
 let tokenize_hexadecimal_literal (tokenizer : t)
-  : (Token_type.t, Error.t) result
+  : Token_type.t option
   =
   consume_while tokenizer Predicates.is_hexadecimal_digit;
-  Ok Hexadecimal_numeric_literal
+  Some Hexadecimal_numeric_literal
 
-let rec scan (tokenizer : t) : (Token_type.t, Error.t) result =
+let rec scan (tokenizer : t) : Token_type.t option =
   match consume tokenizer with
-  | None -> Error (make_error Unexpected_end_of_file tokenizer)
+  | None ->
+    error Unexpected_end_of_file tokenizer;
+    None
   | Some ("\n" | "\r" | "\t" | " ") ->
     to_next tokenizer;
     scan tokenizer
-  | Some "{" -> Ok Brace_left
-  | Some "}" -> Ok Brace_right
-  | Some "(" -> Ok Paren_left
-  | Some ")" -> Ok Paren_right
-  | Some "=" -> Ok Equal
-  | Some "\\" -> Ok Lambda
+  | Some "{" -> Some Brace_left
+  | Some "}" -> Some Brace_right
+  | Some "(" -> Some Paren_left
+  | Some ")" -> Some Paren_right
+  | Some "=" -> Some Equal
+  | Some "\\" -> Some Lambda
   | Some "-" ->
     (match peek tokenizer with
      | Some ">" ->
        advance tokenizer;
-       Ok Arrow_right
+       Some Arrow_right
      | _ ->
-       Error (make_error (Unrecognized_token "-") tokenizer))
-  | Some ";" -> Ok Semicolon
+       error (Unrecognized_token "-") tokenizer;
+       None)
+  | Some ";" -> Some Semicolon
   | Some "0" ->
     (match peek tokenizer with
      | Some ("b" | "B") ->
@@ -134,30 +148,56 @@ let rec scan (tokenizer : t) : (Token_type.t, Error.t) result =
        tokenize_hexadecimal_literal tokenizer
      | Some grapheme when Predicates.is_decimal_digit grapheme
        ->
-       Error
-         (make_error
-            (Numeric_literal_cannot_have_a_leading_zero grapheme)
-            tokenizer)
-     | _ -> Ok Decimal_numeric_literal)
+       error Numeric_literal_cannot_have_leading_zero tokenizer;
+       None
+     | _ -> Some Decimal_numeric_literal)
   | Some grapheme when Predicates.is_decimal_digit grapheme ->
     tokenize_plain_numeric_literal tokenizer
+  | Some "_" ->
+    (match peek tokenizer with
+     | Some grapheme when Predicates.is_identifier grapheme ->
+       error Identifiers_cannot_start_with_underscore tokenizer;
+       None
+     | _ -> Some Identifier_lowercase)
   | Some grapheme when Predicates.starts_identifier grapheme ->
     tokenize_identifier_lowercase_or_keyword tokenizer
   | Some grapheme ->
-    Error (make_error (Unrecognized_token grapheme) tokenizer)
+    error (Unrecognized_token grapheme) tokenizer;
+    None
 
-let rec tokenize (tokenizer : t)
-  : (Token.t list, Error.t) result
-  =
+let check_token (token : Token.t) (tokenizer : t) : unit =
+  (* lexeme is lazy because we only need it in edge cases but
+     the code looks super ugly if we fetch it in every branch *)
+  let lexeme =
+    lazy (get_lexeme token.position token.length tokenizer)
+  in
+  match token.ty with
+  | Decimal_numeric_literal
+    when String.starts_with ~prefix:"0" (Lazy.force lexeme) ->
+    error Numeric_literal_cannot_have_leading_zero tokenizer
+  | Identifier_lowercase
+    when String.starts_with ~prefix:"_" (Lazy.force lexeme) ->
+    error Identifiers_cannot_start_with_underscore tokenizer
+  | _ -> ()
+
+let check (tokens : Token.t list) (tokenizer : t) : unit =
+  List.iter (Fun.flip check_token tokenizer) tokens
+
+let rec tokenize_lenient (tokenizer : t) : Token.t list option =
   if is_at_end tokenizer
-  then Ok (Dynarray.to_list tokenizer.tokens)
+  then Some (Dynarray.to_list tokenizer.tokens)
   else (
     to_next tokenizer;
-    let*! token_type = scan tokenizer in
+    let*? token_type = scan tokenizer in
     Dynarray.add_last
       tokenizer.tokens
       { ty = token_type
       ; position = tokenizer.start
       ; length = tokenizer.current - tokenizer.start
       };
-    tokenize tokenizer)
+    tokenize_lenient tokenizer)
+
+let tokenize (tokenizer : t) : Token.t list option =
+  let*? tokens = tokenize_lenient tokenizer in
+  check tokens tokenizer;
+  Some tokens

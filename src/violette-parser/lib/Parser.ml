@@ -1,23 +1,50 @@
 open Ext
+open Diagnostic
 
 type t =
-  { file : File.t
+  { doctor : Doctor.t
+  ; file : File.t
   ; tokens : Token.t list
   ; mutable position : int
+  ; brace_stack : Span.t Stack.t
+  ; paren_stack : Span.t Stack.t
   }
 
-let create (file : File.t) (tokens : Token.t list) : t =
-  { file; tokens; position = 0 }
+let create
+      (doctor : Doctor.t)
+      (file : File.t)
+      (tokens : Token.t list)
+  : t
+  =
+  { doctor
+  ; file
+  ; tokens
+  ; position = 0
+  ; brace_stack = Stack.create ()
+  ; paren_stack = Stack.create ()
+  }
 
-let repr { file; tokens; position } : Fmt.t =
+let repr
+      { doctor = _
+      ; file
+      ; tokens
+      ; position
+      ; brace_stack = _
+      ; paren_stack = _
+      }
+  : Fmt.t
+  =
   Repr.record
     "Parser"
-    [ ("file", File.repr file)
+    [ ("doctor", Repr.opaque "doctor")
+    ; ("file", File.repr file)
     ; ("tokens", Repr.list_field (List.map Token.repr tokens))
     ; ("position", Repr.int position)
+    ; ("brace_stack", Repr.opaque "stack")
+    ; ("paren_stack", Repr.opaque "stack")
     ]
 
-let get_lexeme (parser : t) (token : Token.t) : string =
+let get_lexeme (token : Token.t) (parser : t) : string =
   match token.ty with
   | Brace_left -> "{"
   | Brace_right -> "}"
@@ -56,147 +83,196 @@ let consume (parser : t) : Token.t option =
   advance parser;
   Some token
 
-let make_error (error_type : Error.Type.t) (parser : t)
-  : Error.t
-  =
-  { ty = error_type
-  ; span =
-      Span.from_offset
-        parser.file
-        parser.position
-        parser.position
-  }
+let add_error (error : Error.t) (parser : t) : unit =
+  Doctor.add_error error (get_span parser) parser.doctor
 
-let expect
-      ?(error_type : Error.Type.t option)
-      (parser : t)
-      (token_type : Token_type.t)
-  : (Token.t, Error.t) result
+let try_consume (token_type : Token_type.t) (parser : t)
+  : Token.t option
   =
   match peek parser with
   | Some token when token.ty = token_type ->
     advance parser;
-    Ok token
-  | _ ->
-    Error
-      (make_error
-         (Option.value
-            error_type
-            ~default:(Expected_token token_type))
-         parser)
+    Some token
+  | _ -> None
 
-let rec expect_one_of (parser : t) (types : Token_type.t list)
+let rec try_consume_one_of
+          (token_types : Token_type.t list)
+          (parser : t)
+  : Token.t option
+  =
+  match token_types with
+  | [] -> None
+  | first :: rest ->
+    (match try_consume first parser with
+     | Some token -> Some token
+     | None -> try_consume_one_of rest parser)
+
+let expect
+      ?(error : Error.t option)
+      (token_type : Token_type.t)
+      (parser : t)
+  : Token.t option
+  =
+  match try_consume token_type parser with
+  | Some token -> Some token
+  | None ->
+    add_error
+      (Option.value error ~default:(Expected_token token_type))
+      parser;
+    None
+
+let rec expect_one_of
+          ~(error : Error.t)
+          (types : Token_type.t list)
+          (parser : t)
   : Token.t option
   =
   match types with
-  | [] -> None
+  | [] ->
+    add_error error parser;
+    None
   | first :: rest ->
-    (match expect parser first with
-     | Ok token -> Some token
-     | Error _ -> expect_one_of parser rest)
+    (match try_consume first parser with
+     | Some token -> Some token
+     | None -> expect_one_of ~error rest parser)
 
-let matches (parser : t) (ty : Token_type.t) : bool =
-  match expect parser ty with
-  | Error _ -> false
-  | Ok _ -> true
+let matches (ty : Token_type.t) (parser : t) : bool =
+  match try_consume ty parser with
+  | None -> false
+  | Some _ -> true
 
-let eat_maybe (parser : t) (ty : Token_type.t) : unit =
-  let _ = matches parser ty in
+let eat_maybe (ty : Token_type.t) (parser : t) : unit =
+  let _ = matches ty parser in
   ()
 
-let rec parse (parser : t) : (Surface_term.expr, Error.t) result
-  =
-  parse_let parser
+let push_brace (parser : t) : unit =
+  Stack.push (get_span parser) parser.brace_stack
 
-and parse_let (parser : t) : (Surface_term.expr, Error.t) result
-  =
-  if not (matches parser Let)
+let pop_brace (parser : t) : Span.t =
+  Stack.pop parser.brace_stack
+
+let push_paren (parser : t) : unit =
+  Stack.push (get_span parser) parser.paren_stack
+
+let pop_paren (parser : t) : Span.t =
+  Stack.pop parser.paren_stack
+
+let rec parse (parser : t) : Surface_term.expr option =
+  if is_at_end parser then None else parse_let parser
+
+and parse_let (parser : t) : Surface_term.expr option =
+  if not (matches Let parser)
   then parse_function parser
   else
-    let*! name = expect parser Identifier_lowercase in
-    let*! _ = expect parser Equal in
-    let*! body = parse_function parser in
-    Ok (Surface_term.Let (get_lexeme parser name, body))
+    let*? name = expect Identifier_lowercase parser in
+    let*? _ = expect Equal parser in
+    let*? body = parse_function parser in
+    Some (Surface_term.Let (get_lexeme name parser, body))
 
-and parse_function (parser : t)
-  : (Surface_term.expr, Error.t) result
-  =
-  if not (matches parser Lambda)
+and parse_function (parser : t) : Surface_term.expr option =
+  if not (matches Lambda parser)
   then parse_apply parser
   else (
     match parse_params parser with
     | [] ->
-      Error (make_error Expected_parameter_in_lambda parser)
+      add_error Expected_parameter_in_lambda parser;
+      None
     | params ->
-      let*! _ = expect parser Arrow_right in
-      let*! body = parse_apply parser in
-      Ok (Surface_term.Function (params, body)))
+      let*? _ = expect Arrow_right parser in
+      let*? body = parse_apply parser in
+      Some (Surface_term.Function (params, body)))
 
 and parse_params (parser : t) : string list =
-  match expect parser Identifier_lowercase with
-  | Error _ -> []
-  | Ok first -> get_lexeme parser first :: parse_params parser
+  match try_consume Identifier_lowercase parser with
+  | None -> []
+  | Some first -> get_lexeme first parser :: parse_params parser
 
-and parse_apply (parser : t)
-  : (Surface_term.expr, Error.t) result
-  =
-  let*! expr = parse_block parser in
+and parse_apply (parser : t) : Surface_term.expr option =
+  let*? expr = parse_block parser in
   match parse_args parser with
-  | [] -> Ok expr
-  | args -> Ok (Surface_term.Apply (expr, args))
+  | [] -> Some expr
+  | args -> Some (Surface_term.Apply (expr, args))
 
 and parse_args (parser : t) : Surface_term.expr list =
   match parse_block parser with
-  | Error _ -> []
-  | Ok first -> first :: parse_args parser
+  | None -> []
+  | Some first -> first :: parse_args parser
 
-and parse_block (parser : t)
-  : (Surface_term.expr, Error.t) result
-  =
-  if not (matches parser Brace_left)
+and parse_block (parser : t) : Surface_term.expr option =
+  if not (matches Brace_left parser)
   then parse_atom parser
   else (
+    push_brace parser;
     let exprs = parse_several_expressions parser in
-    eat_maybe parser Semicolon;
-    let*! _ =
-      expect ~error_type:Unmatched_brace parser Brace_right
+    eat_maybe Semicolon parser;
+    let*? _ =
+      expect
+        ~error:(Unmatched_brace (pop_brace parser))
+        Brace_right
+        parser
     in
-    Ok (Surface_term.Block exprs))
+    Some (Surface_term.Block exprs))
 
 and parse_several_expressions (parser : t)
   : Surface_term.expr list
   =
   match parse parser with
-  | Error _ -> []
-  | Ok first ->
-    if not (matches parser Semicolon)
+  | None -> []
+  | Some first ->
+    if not (matches Semicolon parser)
     then [ first ]
     else first :: parse_several_expressions parser
 
-and parse_atom (parser : t)
-  : (Surface_term.expr, Error.t) result
-  =
-  if matches parser Paren_left
-  then
-    if matches parser Paren_right
-    then Ok Unit
-    else Error (make_error Unmatched_parenthesis parser)
+and parse_atom (parser : t) : Surface_term.expr option =
+  parse_unit parser
+
+and parse_unit (parser : t) : Surface_term.expr option =
+  if not (matches Paren_left parser)
+  then parse_numeric_literal parser
   else (
-    match
-      expect_one_of
-        parser
-        [ Binary_numeric_literal
-        ; Decimal_numeric_literal
-        ; Hexadecimal_numeric_literal
-        ]
-    with
-    | Some token ->
-      Ok
-        (Natural
-           (Int64.of_int
-              (int_of_string (get_lexeme parser token))))
-    | None ->
-      (match expect parser Identifier_lowercase with
-       | Error _ ->
-         Error (make_error Expected_expression parser)
-       | Ok token -> Ok (Variable (get_lexeme parser token))))
+    push_paren parser;
+    if not (matches Paren_right parser)
+    then (
+      add_error
+        (Unmatched_parenthesis (pop_paren parser))
+        parser;
+      None)
+    else Some Unit)
+
+and parse_numeric_literal (parser : t)
+  : Surface_term.expr option
+  =
+  match
+    try_consume_one_of
+      [ Binary_numeric_literal
+      ; Decimal_numeric_literal
+      ; Hexadecimal_numeric_literal
+      ]
+      parser
+  with
+  | None -> parse_identifier parser
+  | Some token ->
+    Some
+      (Natural
+         (Int64.of_int
+            (int_of_string (get_lexeme token parser))))
+
+and parse_identifier (parser : t) : Surface_term.expr option =
+  match try_consume Identifier_lowercase parser with
+  | None ->
+    fail_parsing parser;
+    None
+  | Some token -> Some (Variable (get_lexeme token parser))
+
+and fail_parsing (parser : t) : unit =
+  match peek_type parser with
+  | None -> add_error Unexpected_end_of_file parser
+  | Some Brace_right ->
+    add_error (Unmatched_brace (get_span parser)) parser
+  | Some Paren_right ->
+    add_error (Unmatched_brace (get_span parser)) parser
+  | Some (Arrow_right | Equal | Semicolon) ->
+    add_error
+      (Unexpected_token (Option.get (peek parser)))
+      parser
+  | Some _ -> add_error Expected_expression parser

@@ -3,6 +3,7 @@ open Ext
 
 type t =
   { mutable env : Core_term_normal_form.t Env.t
+  ; doctor : Doctor.t
   ; mutable prompt_in : Fmt.t
   ; mutable prompt_out : Fmt.t
   ; mutable prompt_err : Fmt.t
@@ -44,16 +45,18 @@ module Defaults = struct
 end
 
 let create
+      ?(env = [])
+      ?(doctor = Doctor.create ())
       ?(prompt_in = Defaults.prompt_in)
       ?(prompt_out = Defaults.prompt_out)
       ?(prompt_err = Defaults.prompt_err)
       ?(banner_start = Defaults.banner_start)
       ?(banner_end = Defaults.banner_end)
-      ?(env = [])
       ()
   : t
   =
   { env
+  ; doctor
   ; prompt_in
   ; prompt_out
   ; prompt_err
@@ -63,6 +66,7 @@ let create
 
 let repr
       { env = _
+      ; doctor = _
       ; prompt_in
       ; prompt_out
       ; prompt_err
@@ -74,6 +78,7 @@ let repr
   Repr.record
     "Toplevel"
     [ ("env", Repr.opaque "env")
+    ; ("doctor", Repr.opaque "doctor")
     ; ("prompt_in", prompt_in)
     ; ("prompt_out", prompt_out)
     ; ("prompt_err", prompt_err)
@@ -129,25 +134,31 @@ let print_value (value : Core_term_normal_form.t) (toplevel : t)
   =
   respond (Core_term_normal_form.repr value) toplevel
 
-let print_error (error : Error.t) (toplevel : t) : unit =
-  (* todo: properly render the error *)
-  respond ~channel_type:`Err (Error.render error) toplevel
+let report_errors (toplevel : t) : unit =
+  let review = Doctor.review ~mode:`Toplevel toplevel.doctor in
+  let out = get_channel `Err in
+  List.iter
+    (fun diagnostic -> Fmt.print ~out diagnostic)
+    review.details
 
 let eval (source : string) (toplevel : t)
-  : (Core_term_normal_form.t, Error.t) result
+  : Core_term_normal_form.t option
   =
   let file = File.create ~path:"<toplevel>" ~contents:source in
-  let tokenizer = Tokenizer.create file in
-  let*! tokens = Tokenizer.tokenize tokenizer in
-  let parser = Parser.create file tokens in
-  let*! expr = Parser.parse parser in
+  let tokenizer = Tokenizer.create toplevel.doctor file in
+  let*? tokens = Tokenizer.tokenize tokenizer in
+  let parser = Parser.create toplevel.doctor file tokens in
+  let*? expr = Parser.parse parser in
   let term = Lowering.surface_to_core expr in
   let interpreter =
-    Tree_walk_interpreter.create ~env:toplevel.env file
+    Tree_walk_interpreter.create
+      ~env:toplevel.env
+      toplevel.doctor
+      file
   in
-  let*! value = Tree_walk_interpreter.eval term interpreter in
+  let*? value = Tree_walk_interpreter.eval term interpreter in
   toplevel.env <- interpreter.env;
-  Ok value
+  Some value
 
 let setup (toplevel : t) : unit =
   Out_channel.set_buffered stderr false;
@@ -158,8 +169,9 @@ let rec loop (toplevel : t) =
   | None -> ()
   | Some source ->
     (match eval source toplevel with
-     | Ok value -> print_value value toplevel
-     | Error error -> print_error error toplevel);
+     | Some value -> print_value value toplevel
+     | None -> report_errors toplevel);
+    Doctor.clear toplevel.doctor;
     loop toplevel
 
 let teardown (toplevel : t) =
