@@ -1,5 +1,5 @@
 (test
  (name test_violette_toplevel)
- (libraries ansifmt violette-core-term-normal-form violette-ext violette-file
-  violette-lowering violette-parser violette-repr violette-tokenizer
+ (libraries ansifmt violette-ext violette-file violette-lowering
+  violette-normal-form-poly violette-parser violette-repr violette-tokenizer
   violette-tree-walk-interpreter))

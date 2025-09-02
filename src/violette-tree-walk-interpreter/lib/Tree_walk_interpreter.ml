@@ -4,14 +4,15 @@ open Diagnostic
 type t =
   { doctor : Doctor.t
   ; file : File.t
-  ; mutable env : Core_term_normal_form.t Env.t
+  ; mutable env : Core_term.t Normal_form_poly.t Env.t
   }
 
 let create ?(env = []) (doctor : Doctor.t) (file : File.t) : t =
   { doctor; file; env }
 
 let fork
-      ?with_env:(env : Core_term_normal_form.t Env.t option)
+      ?with_env:
+        (env : Core_term.t Normal_form_poly.t Env.t option)
       (interpreter : t)
   : t
   =
@@ -34,20 +35,20 @@ let add_error (error : Error.t) (interpreter : t) : unit =
     interpreter.doctor
 
 let fetch_variable (name : string) (interpreter : t)
-  : Core_term_normal_form.t option
+  : Core_term.t Normal_form_poly.t option
   =
   Env.fetch name interpreter.env
 
 let set_variable
       (name : string)
-      (value : Core_term_normal_form.t)
+      (value : Core_term.t Normal_form_poly.t)
       (interpreter : t)
   : unit
   =
   interpreter.env <- (name, value) :: interpreter.env
 
 let rec eval (term : Core_term.t) (interpreter : t)
-  : Core_term_normal_form.t option
+  : Core_term.t Normal_form_poly.t option
   =
   match term with
   | Apply (func, arg) ->
@@ -62,25 +63,25 @@ let rec eval (term : Core_term.t) (interpreter : t)
   | Let (name, body) ->
     let*? body_normal_form = eval body interpreter in
     set_variable name body_normal_form interpreter;
-    Some Core_term_normal_form.Unit
+    Some Normal_form_poly.Unit
   | Natural value -> Some (Natural value)
   | Unit -> Some Unit
   | Variable name -> fetch_variable name interpreter
 
 and eval_scoped
       (term : Core_term.t)
-      (env : Core_term_normal_form.t Env.t)
+      (env : Core_term.t Normal_form_poly.t Env.t)
       (interpreter : t)
-  : Core_term_normal_form.t option
+  : Core_term.t Normal_form_poly.t option
   =
   let subinterpreter = fork ~with_env:env interpreter in
   eval term subinterpreter
 
 and apply_function
-      (func : Core_term_normal_form.t)
-      (arg : Core_term_normal_form.t)
+      (func : Core_term.t Normal_form_poly.t)
+      (arg : Core_term.t Normal_form_poly.t)
       (interpreter : t)
-  : Core_term_normal_form.t option
+  : Core_term.t Normal_form_poly.t option
   =
   match func with
   | Closure (env, param, body) ->
@@ -94,7 +95,7 @@ and apply_function
 and eval_block_exprs
       (exprs : Core_term.t list)
       (interpreter : t)
-  : Core_term_normal_form.t option
+  : Core_term.t Normal_form_poly.t option
   =
   match exprs with
   | [] -> Some Unit

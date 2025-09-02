@@ -1,4 +1,4 @@
 (test
  (name test_violette_tree_walk_interpreter)
- (libraries ansifmt violette-core-term violette-core-term-normal-form
-  violette-ext violette-file violette-span))
+ (libraries ansifmt violette-core-term violette-ext violette-file
+  violette-normal-form-poly violette-span))

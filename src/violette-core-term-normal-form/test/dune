@@ -1,3 +1,0 @@
-(test
- (name test_violette_core_term_normal_form)
- (libraries ansifmt violette-core-term violette-repr))

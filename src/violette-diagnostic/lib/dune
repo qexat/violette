@@ -1,6 +1,5 @@
 (library
  (public_name violette-diagnostic)
  (name diagnostic)
- (libraries ansifmt violette-core-term violette-core-term-normal-form
-  violette-ext violette-repr violette-span violette-token
-  violette-token-type))
+ (libraries ansifmt violette-core-term violette-ext violette-normal-form-poly
+  violette-repr violette-span violette-token violette-token-type))

@@ -1,6 +1,6 @@
 (lang dune 3.20)
 
-(name violette-core-term-normal-form)
+(name violette-normal-form-poly)
 
 (generate_opam_files true)
 
@@ -16,10 +16,10 @@
 (documentation https://qexat.github.io/violette)
 
 (package
- (name violette-core-term-normal-form)
- (synopsis "The normal form of Violette's core term language")
+ (name violette-normal-form-poly)
+ (synopsis "A generic normal form for Violette runtime values")
  (description
-  "violette-core-term-normal-form provides a language that represents the normal form of Violette's core term one.")
+  "violette-normal-form-poly provides a template normal form for various Violette interpreters.")
  (depends
   (ocaml
    (>= 5.3))))
