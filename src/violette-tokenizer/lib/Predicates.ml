@@ -1,8 +1,9 @@
 let starts_identifier (grapheme : string) : bool =
-  ("a" <= grapheme && grapheme <= "z") || grapheme = "_"
+  "a" <= grapheme && grapheme <= "z"
 
 let is_identifier (grapheme : string) : bool =
   starts_identifier grapheme
+  || grapheme = "_"
   || ("0" <= grapheme && grapheme <= "9")
 
 let is_binary_digit (grapheme : string) : bool =
