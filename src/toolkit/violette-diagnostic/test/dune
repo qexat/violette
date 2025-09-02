@@ -1,4 +1,4 @@
 (test
  (name test_violette_diagnostic)
  (libraries ansifmt violette-core-term violette-ext violette-normal-form
-  violette-repr violette-span violette-token-type))
+  violette-repr violette-span violette-token violette-token-type))

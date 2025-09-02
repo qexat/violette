@@ -1,4 +1,5 @@
 (test
  (name test_violette_tokenizer)
- (libraries ansifmt violette-file violette-repr violette-token
+ (libraries ansifmt violette-diagnostic violette-doctor violette-ext
+  violette-file violette-repr violette-span violette-token
   violette-token-type))

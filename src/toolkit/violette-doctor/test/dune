@@ -1,3 +1,4 @@
 (test
  (name test_violette_doctor)
- (libraries ansifmt violette-diagnostic violette-repr))
+ (libraries ansifmt violette-diagnostic violette-ext violette-repr
+  violette-span))
