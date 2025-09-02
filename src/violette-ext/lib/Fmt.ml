@@ -16,6 +16,7 @@ let join ?(on : t = Raw " ") (fmts : t list) : t =
   Join (on, fmts)
 
 let concat (fmts : t list) = join ~on:(raw "") fmts
+let join_lines (fmts : t list) = join ~on:(raw "\n") fmts
 let ( ++ ) (left : t) (right : t) : t = concat [ left; right ]
 
 let rec render ~(with_styling : bool) (fmt : t) : string =
