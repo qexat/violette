@@ -2,9 +2,8 @@ open Ext
 
 type t =
   | Apply of t * t
-  | Block of t list
   | Function of string * t
-  | Let of string * t
+  | Let of string * t * t
   | Natural of int64
   | Unit
   | Variable of string
@@ -19,18 +18,17 @@ let rec repr : t -> Fmt.t = function
     Repr.record
       "Apply"
       [ ("function", repr func); ("argument", repr arg) ]
-  | Block terms ->
-    Repr.record
-      "Block"
-      [ ("terms", Repr.list_field (List.map repr terms)) ]
   | Function (param, body) ->
     Repr.record
       "Function"
       [ ("param", Repr.string param); ("body", repr body) ]
-  | Let (name, body) ->
+  | Let (name, body, block) ->
     Repr.record
       "Let"
-      [ ("name", Repr.string name); ("body", repr body) ]
+      [ ("name", Repr.string name)
+      ; ("body", repr body)
+      ; ("block", repr block)
+      ]
   | Natural value ->
     Repr.record
       "Natural"

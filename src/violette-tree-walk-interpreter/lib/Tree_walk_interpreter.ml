@@ -55,15 +55,13 @@ let rec eval (term : Core_term.t) (interpreter : t)
     let*? func_normal_form = eval func interpreter in
     let*? arg_normal_form = eval arg interpreter in
     apply_function func_normal_form arg_normal_form interpreter
-  | Block terms ->
-    let subinterpreter = fork interpreter in
-    eval_block_exprs terms subinterpreter
   | Function (param, body) ->
     Some (Closure (interpreter.env, param, body))
-  | Let (name, body) ->
+  | Let (name, body, block) ->
     let*? body_normal_form = eval body interpreter in
-    set_variable name body_normal_form interpreter;
-    Some Normal_form_poly.Unit
+    let subinterpreter = fork interpreter in
+    set_variable name body_normal_form subinterpreter;
+    eval block subinterpreter
   | Natural value -> Some (Natural value)
   | Unit -> Some Unit
   | Variable name -> fetch_variable name interpreter
@@ -91,15 +89,3 @@ and apply_function
   | Natural _ | Unit ->
     add_error (Illegal_application func) interpreter;
     None
-
-and eval_block_exprs
-      (exprs : Core_term.t list)
-      (interpreter : t)
-  : Core_term.t Normal_form_poly.t option
-  =
-  match exprs with
-  | [] -> Some Unit
-  | last :: [] -> eval last interpreter
-  | first :: rest ->
-    let*? _ = eval first interpreter in
-    eval_block_exprs rest interpreter
