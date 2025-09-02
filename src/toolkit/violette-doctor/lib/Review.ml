@@ -23,3 +23,17 @@ let decide (diagnostics : Diagnostic.t list)
   if List.exists requires_abortion diagnostics
   then `Abort
   else `Pass
+
+let concat_decision
+      (left : [ `Pass | `Abort ])
+      (right : [ `Pass | `Abort ])
+  : [ `Pass | `Abort ]
+  =
+  match (left, right) with
+  | (`Pass, `Pass) -> `Pass
+  | (_, _) -> `Abort
+
+let ( <> ) (left : t) (right : t) : t =
+  { decision = concat_decision left.decision right.decision
+  ; details = left.details @ right.details
+  }

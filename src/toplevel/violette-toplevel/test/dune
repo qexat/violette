@@ -1,0 +1,5 @@
+(test
+ (name test_violette_toplevel)
+ (libraries ansifmt violette-compiler violette-ext violette-file
+  violette-surface-lowering violette-normal-form violette-parser
+  violette-repr violette-tokenizer violette-tree-walk-interpreter))

@@ -1,0 +1,25 @@
+(lang dune 3.20)
+
+(name violette-compiler)
+
+(generate_opam_files true)
+
+(source
+ (github qexat/violette))
+
+(authors "lexa <hello@lexa.qexat.com>")
+
+(maintainers "lexa <hello@lexa.qexat.com>")
+
+(license MIT)
+
+(documentation https://qexat.github.io/violette)
+
+(package
+ (name violette-compiler)
+ (synopsis "The compiler for Violette")
+ (description
+  "violette-compiler provides a compiler suite for the Violette programming language.")
+ (depends
+  (ocaml
+   (>= 5.3))))

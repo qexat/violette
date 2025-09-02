@@ -1,0 +1,6 @@
+(library
+ (public_name violette-toplevel)
+ (name toplevel)
+ (libraries ansifmt violette-compiler violette-doctor violette-diagnostic
+  violette-ext violette-file violette-normal-form violette-repr
+  violette-tree-walk-interpreter))

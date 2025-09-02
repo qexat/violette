@@ -1,6 +1,6 @@
 (lang dune 3.20)
 
-(name violette-lowering)
+(name violette-surface-lowering)
 
 (generate_opam_files true)
 
@@ -16,7 +16,7 @@
 (documentation https://qexat.github.io/violette)
 
 (package
- (name violette-lowering)
+ (name violette-surface-lowering)
  (synopsis "A short synopsis")
  (description "A longer description")
  (depends

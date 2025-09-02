@@ -44,6 +44,10 @@ module Defaults = struct
     stylize (raw "Goodbye!") (`Foreground Color.yellow)
 end
 
+module Output = struct
+  type t = Core_term.t Normal_form.t Compiler.Output.t
+end
+
 let create
       ?(env = [])
       ?(doctor = Doctor.create ())
@@ -143,15 +147,18 @@ let report_errors (toplevel : t) : unit =
     (fun diagnostic -> Fmt.print ~out diagnostic)
     review.details
 
+let compile (file : File.t) (toplevel : t) : Core_term.t option =
+  let compiler = Compiler.create toplevel.doctor file in
+  let output = Compiler.compile ~target:Lambda_core compiler in
+  match output.artifact with
+  | None -> None
+  | Some (Lambda_core term) -> Some term
+
 let eval (source : string) (toplevel : t)
   : Core_term.t Normal_form.t option
   =
   let file = File.create ~path:"<toplevel>" ~contents:source in
-  let tokenizer = Tokenizer.create toplevel.doctor file in
-  let*? tokens = Tokenizer.tokenize tokenizer in
-  let parser = Parser.create toplevel.doctor file tokens in
-  let*? expr = Parser.parse parser in
-  let term = Lowering.surface_to_core expr in
+  let*? term = compile file toplevel in
   let interpreter =
     Tree_walk_interpreter.create
       ~env:toplevel.env
