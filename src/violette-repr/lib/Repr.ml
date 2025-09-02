@@ -115,3 +115,14 @@ let record (name : string) (fields : (string * Fmt.t) list)
   ; punctuation "}"
   ]
   |> join ~on:(raw " ")
+
+(* diagnostic stuff *)
+
+let error (contents : string) : Fmt.t =
+  stylize (raw contents) (`Foreground Color.red & `Bold)
+
+let warning (contents : string) : Fmt.t =
+  stylize (raw contents) (`Foreground Color.yellow & `Bold)
+
+let info (contents : string) : Fmt.t =
+  stylize (raw contents) (`Foreground Color.blue & `Bold)
