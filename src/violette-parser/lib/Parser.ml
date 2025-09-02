@@ -34,8 +34,14 @@ let get_lexeme (parser : t) (token : Token.t) : string =
     String.sub parser.file.contents token.position token.length
   | Semicolon -> ";"
 
+let get_span (parser : t) : Span.t =
+  Span.from_offset parser.file parser.position parser.position
+
 let peek (parser : t) : Token.t option =
   List.nth_opt parser.tokens parser.position
+
+let peek_type (parser : t) : Token_type.t option =
+  Option.map (fun token -> token.Token.ty) (peek parser)
 
 let is_at_end (parser : t) : bool =
   match peek parser with
