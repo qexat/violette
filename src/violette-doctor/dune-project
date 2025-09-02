@@ -1,0 +1,25 @@
+(lang dune 3.20)
+
+(name violette-doctor)
+
+(generate_opam_files true)
+
+(source
+ (github qexat/violette))
+
+(authors "lexa <hello@lexa.qexat.com>")
+
+(maintainers "lexa <hello@lexa.qexat.com>")
+
+(license MIT)
+
+(documentation https://qexat.github.io/violette)
+
+(package
+ (name violette-doctor)
+ (synopsis "A diagnostic manager for Violette")
+ (description
+  "violette-doctor provides a tool for managing diagnostics emitted from Violette's components.")
+ (depends
+  (ocaml
+   (>= 5.3))))

@@ -1,0 +1,25 @@
+(lang dune 3.20)
+
+(name violette-diagnostic)
+
+(generate_opam_files true)
+
+(source
+ (github qexat/violette))
+
+(authors "lexa <hello@lexa.qexat.com>")
+
+(maintainers "lexa <hello@lexa.qexat.com>")
+
+(license MIT)
+
+(documentation https://qexat.github.io/violette)
+
+(package
+ (name violette-diagnostic)
+ (synopsis "A type for Violette's diagnostic system")
+ (description
+  "violette-diagnostic provides a data type used by various components of Violette to produce diagnostics.")
+ (depends
+  (ocaml
+   (>= 5.3))))

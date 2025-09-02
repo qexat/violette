@@ -1,0 +1,5 @@
+(library
+ (public_name violette-doctor)
+ (name doctor)
+ (libraries ansifmt violette-diagnostic violette-ext violette-span
+  violette-repr))
