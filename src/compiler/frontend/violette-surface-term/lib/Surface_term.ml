@@ -8,7 +8,7 @@ type expr =
   | Block of expr list
   | Apply of expr * expr list
   | Function of string list * expr
-  | Let of string * expr
+  | Let of string * string list * expr
 
 let rec repr : expr -> Fmt.t = function
   | Natural value -> Repr.numeric (Int64.to_string value)
@@ -18,4 +18,5 @@ let rec repr : expr -> Fmt.t = function
   | Apply (func, args) ->
     Repr.application (repr func) (List.map repr args)
   | Function (params, body) -> Repr.func params (repr body)
-  | Let (name, body) -> Repr.let_definition name (repr body)
+  | Let (name, params, body) ->
+    Repr.let_definition name ~params (repr body)

@@ -75,8 +75,18 @@ let func (params : string list) (body : Fmt.t) : Fmt.t =
   ++ join
        [ join (List.map parameter params); operator "->"; body ]
 
-let let_definition (name : string) (body : Fmt.t) : Fmt.t =
-  join [ keyword "let"; identifier name; operator "="; body ]
+let let_definition
+      (name : string)
+      ?(params : string list = [])
+      (body : Fmt.t)
+  : Fmt.t
+  =
+  join
+    [ keyword "let"
+    ; join (identifier name :: List.map parameter params)
+    ; operator "="
+    ; body
+    ]
 
 (* OCaml specific *)
 

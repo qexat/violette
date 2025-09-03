@@ -165,9 +165,11 @@ and parse_let (parser : t) : Surface_term.expr option =
   then parse_function parser
   else
     let*? name = expect Identifier_lowercase parser in
+    let params = parse_params parser in
     let*? _ = expect Equal parser in
     let*? body = parse_function parser in
-    Some (Surface_term.Let (get_lexeme name parser, body))
+    Some
+      (Surface_term.Let (get_lexeme name parser, params, body))
 
 and parse_function (parser : t) : Surface_term.expr option =
   if not (matches Lambda parser)
