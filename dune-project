@@ -25,3 +25,5 @@
    (>= 5.3)))
  (tags
   (functional "programming language" violette)))
+
+(implicit_transitive_deps false)
