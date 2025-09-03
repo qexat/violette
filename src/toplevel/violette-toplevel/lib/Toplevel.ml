@@ -2,13 +2,14 @@ open Ansifmt
 open Ext
 
 type t =
-  { mutable env : Lambda_core.t Normal_form.t Env.t
-  ; doctor : Doctor.t
+  { doctor : Doctor.t
+  ; mutable env : Lambda_core.t Normal_form.t Env.t
   ; mutable prompt_in : Fmt.t
   ; mutable prompt_out : Fmt.t
   ; mutable prompt_err : Fmt.t
   ; mutable banner_start : Fmt.t
-  ; mutable banner_end : Fmt.t
+  ; mutable banner_end : Fmt.t (* config *)
+  ; mutable show_styling : [ `Auto | `Always | `Never ]
   }
 
 type state =
@@ -56,6 +57,7 @@ let create
       ?(prompt_err = Defaults.prompt_err)
       ?(banner_start = Defaults.banner_start)
       ?(banner_end = Defaults.banner_end)
+      ~(show_styling : [ `Always | `Auto | `Never ])
       ()
   : t
   =
@@ -66,6 +68,7 @@ let create
   ; prompt_err
   ; banner_start
   ; banner_end
+  ; show_styling
   }
 
 let repr
@@ -76,6 +79,7 @@ let repr
       ; prompt_err
       ; banner_start
       ; banner_end
+      ; show_styling = _
       }
   : Fmt.t
   =
@@ -88,6 +92,7 @@ let repr
     ; ("prompt_err", prompt_err)
     ; ("banner_start", banner_start)
     ; ("banner_end", banner_end)
+    ; ("show_styling", Repr.opaque "option")
     ]
 
 let get_channel : [ `Out | `Err ] -> out_channel = function

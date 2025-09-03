@@ -1,0 +1,4 @@
+(library
+ (public_name violette-cli)
+ (name cli)
+ (libraries ansifmt cmdliner violette-ext violette-toplevel violette-repr))
