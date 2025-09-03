@@ -3,7 +3,8 @@ open Ext
 type t =
   | Apply of t * t
   | Function of string * t
-  | Let of string * t * t
+  | Let of string * t
+  | Let_in of string * t * t
   | Natural of int64
   | Unit
   | Variable of string
@@ -22,7 +23,11 @@ let rec repr : t -> Fmt.t = function
     Repr.record
       "Function"
       [ ("param", Repr.string param); ("body", repr body) ]
-  | Let (name, body, block) ->
+  | Let (name, body) ->
+    Repr.record
+      "Let"
+      [ ("name", Repr.string name); ("body", repr body) ]
+  | Let_in (name, body, block) ->
     Repr.record
       "Let"
       [ ("name", Repr.string name)

@@ -25,7 +25,7 @@ let rec lower (expr : Surface_term.expr) : Lambda_core.t =
       ~fixpoint_map:lower
       ~item_map:Fun.id
       ~constructor:Lambda_core.( @=> )
-  | Let (name, body) -> Let (name, lower body, Unit)
+  | Let (name, body) -> Let (name, lower body)
   | Natural value -> Natural value
   | Unit -> Unit
   | Variable name -> Variable name
@@ -37,9 +37,9 @@ and lower_surface_block (exprs : Surface_term.expr list)
   | [] -> Unit
   | last :: [] -> lower last
   | Let (name, body) :: rest ->
-    Let (name, lower body, lower_surface_block rest)
+    Let_in (name, lower body, lower_surface_block rest)
   | valued :: rest ->
-    Let
+    Let_in
       ( make_dummy_identifier ()
       , lower valued
       , lower_surface_block rest )

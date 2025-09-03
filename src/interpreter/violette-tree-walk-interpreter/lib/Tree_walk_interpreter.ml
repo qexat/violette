@@ -60,7 +60,11 @@ let rec eval (term : Lambda_core.t) (interpreter : t)
     apply_function func_normal_form arg_normal_form interpreter
   | Function (param, body) ->
     Some (Closure (interpreter.env, param, body))
-  | Let (name, body, block) ->
+  | Let (name, body) ->
+    let*? body_normal_form = eval body interpreter in
+    set_variable name body_normal_form interpreter;
+    Some Normal_form.Unit
+  | Let_in (name, body, block) ->
     let*? body_normal_form = eval body interpreter in
     let subinterpreter = fork interpreter in
     set_variable name body_normal_form subinterpreter;
