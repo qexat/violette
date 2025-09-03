@@ -1,4 +1,4 @@
 (library
  (public_name violette-surface-lowering)
  (name surface_lowering)
- (libraries violette-core-term violette-curry violette-surface-term))
+ (libraries violette-lambda-core violette-curry violette-surface-term))

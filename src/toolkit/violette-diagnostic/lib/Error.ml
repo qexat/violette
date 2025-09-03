@@ -14,7 +14,7 @@ type t =
   | Unmatched_brace of Span.t
   | Unmatched_parenthesis of Span.t
   (* --- interpretation --- *)
-  | Illegal_application of Core_term.t Normal_form.t
+  | Illegal_application of Lambda_core.t Normal_form.t
   | Unbound_variable of string
 
 let repr (_ : t) : Fmt.t = Repr.opaque "error"

@@ -1,7 +1,7 @@
 (library
  (public_name violette-compiler)
  (name compiler)
- (libraries ansifmt violette-core-term violette-doctor violette-ext
+ (libraries ansifmt violette-lambda-core violette-doctor violette-ext
   violette-file violette-normal-form violette-parser violette-repr
   violette-surface-lowering violette-surface-term violette-token
   violette-token-type violette-tokenizer))

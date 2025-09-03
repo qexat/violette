@@ -1,4 +1,4 @@
 (library
- (public_name violette-core-term)
- (name core_term)
+ (public_name violette-lambda-core)
+ (name lambda_core)
  (libraries ansifmt violette-ext violette-repr))

@@ -1,5 +1,5 @@
 (library
  (public_name violette-tree-walk-interpreter)
  (name tree_walk_interpreter)
- (libraries ansifmt violette-core-term violette-diagnostic violette-doctor
+ (libraries ansifmt violette-lambda-core violette-diagnostic violette-doctor
   violette-ext violette-file violette-normal-form violette-span))

@@ -1,6 +1,6 @@
 (lang dune 3.20)
 
-(name violette-core-term)
+(name violette-lambda-core)
 
 (generate_opam_files true)
 
@@ -16,10 +16,10 @@
 (documentation https://qexat.github.io/violette)
 
 (package
- (name violette-core-term)
+ (name violette-lambda-core)
  (synopsis "The core term language of Violette")
  (description
-  "violette-core-term provides a term language used by Violette for semantic analysis and lowering.")
+  "violette-lambda-core provides a term language used by Violette for semantic analysis and lowering.")
  (depends
   (ocaml
    (>= 5.3))))

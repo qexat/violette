@@ -8,7 +8,7 @@ let make_index =
 let make_dummy_identifier () =
   "$" ^ Int.to_string (make_index ())
 
-let rec lower (expr : Surface_term.expr) : Core_term.t =
+let rec lower (expr : Surface_term.expr) : Lambda_core.t =
   match expr with
   | Apply (func, args) ->
     Curry.curry_left
@@ -16,7 +16,7 @@ let rec lower (expr : Surface_term.expr) : Core_term.t =
       args
       ~fixpoint_map:lower
       ~item_map:lower
-      ~constructor:Core_term.apply
+      ~constructor:Lambda_core.apply
   | Block exprs -> lower_surface_block exprs
   | Function (params, body) ->
     Curry.curry_right
@@ -24,14 +24,14 @@ let rec lower (expr : Surface_term.expr) : Core_term.t =
       body
       ~fixpoint_map:lower
       ~item_map:Fun.id
-      ~constructor:Core_term.( @=> )
+      ~constructor:Lambda_core.( @=> )
   | Let (name, body) -> Let (name, lower body, Unit)
   | Natural value -> Natural value
   | Unit -> Unit
   | Variable name -> Variable name
 
 and lower_surface_block (exprs : Surface_term.expr list)
-  : Core_term.t
+  : Lambda_core.t
   =
   match exprs with
   | [] -> Unit

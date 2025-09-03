@@ -1,2 +1,2 @@
 type 'target t =
-  | Lambda_core : Core_term.t -> Target.lambda_core t
+  | Lambda_core : Lambda_core.t -> Target.lambda_core t

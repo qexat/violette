@@ -2,7 +2,7 @@ open Ansifmt
 open Ext
 
 type t =
-  { mutable env : Core_term.t Normal_form.t Env.t
+  { mutable env : Lambda_core.t Normal_form.t Env.t
   ; doctor : Doctor.t
   ; mutable prompt_in : Fmt.t
   ; mutable prompt_out : Fmt.t
@@ -45,7 +45,7 @@ module Defaults = struct
 end
 
 module Output = struct
-  type t = Core_term.t Normal_form.t Compiler.Output.t
+  type t = Lambda_core.t Normal_form.t Compiler.Output.t
 end
 
 let create
@@ -134,7 +134,7 @@ let respond
   Fmt.print ~out message
 
 let print_value
-      (value : Core_term.t Normal_form.t)
+      (value : Lambda_core.t Normal_form.t)
       (toplevel : t)
   : unit
   =
@@ -147,7 +147,9 @@ let report_errors (toplevel : t) : unit =
     (fun diagnostic -> Fmt.print ~out diagnostic)
     review.details
 
-let compile (file : File.t) (toplevel : t) : Core_term.t option =
+let compile (file : File.t) (toplevel : t)
+  : Lambda_core.t option
+  =
   let compiler = Compiler.create toplevel.doctor file in
   let output = Compiler.compile ~target:Lambda_core compiler in
   match output.artifact with
@@ -155,7 +157,7 @@ let compile (file : File.t) (toplevel : t) : Core_term.t option =
   | Some (Lambda_core term) -> Some term
 
 let eval (source : string) (toplevel : t)
-  : Core_term.t Normal_form.t option
+  : Lambda_core.t Normal_form.t option
   =
   let file = File.create ~path:"<toplevel>" ~contents:source in
   let*? term = compile file toplevel in
