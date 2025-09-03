@@ -194,9 +194,12 @@ and parse_apply (parser : t) : Surface_term.expr option =
   | args -> Some (Surface_term.Apply (expr, args))
 
 and parse_args (parser : t) : Surface_term.expr list =
-  match parse_block parser with
-  | None -> []
-  | Some first -> first :: parse_args parser
+  if is_at_end parser
+  then []
+  else (
+    match parse_block parser with
+    | None -> []
+    | Some first -> first :: parse_args parser)
 
 and parse_block (parser : t) : Surface_term.expr option =
   if not (matches Brace_left parser)
