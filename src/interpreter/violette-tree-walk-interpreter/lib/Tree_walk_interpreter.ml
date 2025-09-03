@@ -30,13 +30,17 @@ let repr (interpreter : t) : Fmt.t =
 let add_error (error : Error.t) (interpreter : t) : unit =
   Doctor.add_error
     error
-    (Span.from_offset interpreter.file ~-1 ~-1)
+    (Span.from_offset interpreter.file 0 0)
     interpreter.doctor
 
 let fetch_variable (name : string) (interpreter : t)
   : Lambda_core.t Normal_form.t option
   =
-  Env.fetch name interpreter.env
+  match Env.fetch name interpreter.env with
+  | None ->
+    add_error (Unbound_variable name) interpreter;
+    None
+  | Some value -> Some value
 
 let set_variable
       (name : string)
