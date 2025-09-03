@@ -13,5 +13,5 @@ current features include:
 To start the toplevel (REPL), run:
 
 ```sh
-dune exec violette
+dune exec violette toplevel
 ```
