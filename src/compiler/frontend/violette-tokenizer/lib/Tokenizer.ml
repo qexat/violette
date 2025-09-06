@@ -6,6 +6,8 @@ type t =
   ; file : File.t
   ; mutable start : int
   ; mutable current : int
+  ; (* this buffer exists to support unicode characters *)
+    buffer : Buffer.t
   ; tokens : Token.t Dynarray.t
   }
 
@@ -14,16 +16,21 @@ let create (doctor : Doctor.t) (file : File.t) : t =
   ; file
   ; start = 0
   ; current = 0
+  ; buffer = Buffer.create 4
   ; tokens = Dynarray.create ()
   }
 
-let repr { doctor = _; file; start; current; tokens } : Fmt.t =
+let repr
+      { doctor = _; file; start; current; buffer = _; tokens }
+  : Fmt.t
+  =
   Repr.record
     "Tokenizer"
     [ ("doctor", Repr.opaque "doctor")
     ; ("file", File.repr file)
     ; ("start", Repr.int start)
     ; ("current", Repr.int current)
+    ; ("buffer", Repr.opaque "buffer")
     ; ( "tokens"
       , Repr.list_field
           (tokens |> Dynarray.to_list |> List.map Token.repr) )
@@ -49,17 +56,23 @@ let to_next (tokenizer : t) =
 let peek (tokenizer : t) : string option =
   if is_at_end tokenizer
   then None
-  else
-    Some
-      (String.sub tokenizer.file.contents tokenizer.current 1)
+  else (
+    Buffer.clear tokenizer.buffer;
+    Buffer.add_utf_8_uchar
+      tokenizer.buffer
+      (Uchar.utf_decode_uchar
+         (String.get_utf_8_uchar
+            tokenizer.file.contents
+            tokenizer.current));
+    Some (Buffer.contents tokenizer.buffer))
 
-let advance (tokenizer : t) =
-  tokenizer.current <- tokenizer.current + 1
+let advance ?(steps = 1) (tokenizer : t) =
+  tokenizer.current <- tokenizer.current + steps
 
 let consume (tokenizer : t) : string option =
-  let*? token = peek tokenizer in
-  advance tokenizer;
-  Some token
+  let*? grapheme = peek tokenizer in
+  advance ~steps:(String.length grapheme) tokenizer;
+  Some grapheme
 
 let matches (tokenizer : t) (grapheme : string) : bool =
   match peek tokenizer with
