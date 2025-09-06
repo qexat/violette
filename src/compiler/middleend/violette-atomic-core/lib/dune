@@ -1,0 +1,4 @@
+(library
+ (public_name violette-atomic-core)
+ (name atomic_core)
+ (libraries ansifmt violette-ext violette-lambda-core violette-repr))

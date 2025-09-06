@@ -1,0 +1,24 @@
+(lang dune 3.20)
+
+(name violette-atomic-normalization)
+
+(generate_opam_files true)
+
+(source
+ (github qexat/violette))
+
+(authors "lexa <hello@lexa.qexat.com>")
+
+(maintainers "lexa <hello@lexa.qexat.com>")
+
+(license MIT)
+
+(documentation https://qexat.github.io/violette)
+
+(package
+ (name violette-atomic-normalization)
+ (synopsis "A short synopsis")
+ (description "A longer description")
+ (depends
+  (ocaml
+   (>= 5.3))))

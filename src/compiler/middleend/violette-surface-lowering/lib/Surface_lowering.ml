@@ -1,12 +1,5 @@
-let make_index =
-  let state = ref 0 in
-  fun () ->
-    let value = !state in
-    incr state;
-    value
-
-let make_dummy_identifier () =
-  "$" ^ Int.to_string (make_index ())
+let make_dummy_identifier =
+  Ext.make_dummy_identifier_generator ~prefix:"lc"
 
 let rec lower (expr : Surface_term.expr) : Lambda_core.t =
   match expr with

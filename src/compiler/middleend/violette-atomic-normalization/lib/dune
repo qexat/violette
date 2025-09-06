@@ -1,0 +1,5 @@
+(library
+ (public_name violette-atomic-normalization)
+ (name atomic_normalization)
+ (libraries ansifmt violette-atomic-core violette-ext violette-lambda-core
+  violette-repr))
