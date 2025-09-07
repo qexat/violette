@@ -17,6 +17,6 @@ let rec repr : expr -> Fmt.t = function
   | Block exprs -> Repr.block (List.map repr exprs)
   | Apply (func, args) ->
     Repr.application (repr func) (List.map repr args)
-  | Function (params, body) -> Repr.func params (repr body)
+  | Function (params, body) -> Repr.lambda params (repr body)
   | Let (name, params, body) ->
     Repr.let_definition name ~params (repr body)

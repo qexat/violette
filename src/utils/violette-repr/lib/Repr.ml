@@ -70,7 +70,7 @@ let block (expressions : Fmt.t list) : Fmt.t =
       ; punctuation "}"
       ]
 
-let func (params : string list) (body : Fmt.t) : Fmt.t =
+let lambda (params : string list) (body : Fmt.t) : Fmt.t =
   keyword "\\"
   ++ join
        [ join (List.map parameter params); operator "->"; body ]
