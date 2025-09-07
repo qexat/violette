@@ -14,6 +14,9 @@ let character (contents : string) : Fmt.t =
        ])
     (`Foreground Color.cyan)
 
+let function_name (name : string) : Fmt.t =
+  stylize (raw name) (`Foreground Color.blue)
+
 let identifier (name : string) : Fmt.t = raw name
 let indent : Fmt.t = raw "  "
 
@@ -143,3 +146,22 @@ let warning (contents : string) : Fmt.t =
 
 let info (contents : string) : Fmt.t =
   stylize (raw contents) (`Foreground Color.blue & `Bold)
+
+(* bytecode *)
+
+let instruction (mnemonic : string) (args : Fmt.t list) : Fmt.t =
+  let mnemonic_fmt = keyword mnemonic in
+  match args with
+  | [] -> mnemonic_fmt
+  | last :: [] -> join ~on:(raw "\t") [ mnemonic_fmt; last ]
+  | _ -> join ~on:(raw "\t") [ mnemonic_fmt; tuple args ]
+
+let section (name : string) (instructions : Fmt.t list) : Fmt.t =
+  join
+    ~on:(raw "\n" ++ indent)
+    (function_name name :: instructions)
+
+let bytecode_directive ?(args : Fmt.t list = []) (name : string)
+  : Fmt.t
+  =
+  join (keyword ("@" ^ name) :: args)
