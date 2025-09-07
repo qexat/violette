@@ -12,7 +12,7 @@ type expr =
 
 let rec repr : expr -> Fmt.t = function
   | Natural value -> Repr.numeric (Int64.to_string value)
-  | Unit -> Repr.operator "()"
+  | Unit -> Repr.tuple []
   | Variable name -> Repr.identifier name
   | Block exprs -> Repr.block (List.map repr exprs)
   | Apply (func, args) ->
