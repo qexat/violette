@@ -15,3 +15,7 @@ To start the toplevel (REPL), run:
 ```sh
 dune exec violette toplevel
 ```
+
+## Publications
+
+- [My plans for Violette](https://qexat.bearblog.dev/plans-for-violette/)
