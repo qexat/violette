@@ -66,7 +66,7 @@ let peek (tokenizer : t) : string option =
             tokenizer.current));
     Some (Buffer.contents tokenizer.buffer))
 
-let advance ?(steps = 1) (tokenizer : t) =
+let advance ~steps (tokenizer : t) =
   tokenizer.current <- tokenizer.current + steps
 
 let consume (tokenizer : t) : string option =
@@ -85,7 +85,7 @@ let rec consume_while
   =
   match peek tokenizer with
   | Some grapheme when predicate grapheme ->
-    advance tokenizer;
+    advance ~steps:(String.length grapheme) tokenizer;
     consume_while tokenizer predicate
   | _ -> ()
 
@@ -145,7 +145,7 @@ let rec scan (tokenizer : t) : Token_type.t option =
   | Some "-" ->
     (match peek tokenizer with
      | Some ">" ->
-       advance tokenizer;
+       advance ~steps:1 tokenizer;
        Some Arrow_right
      | _ ->
        error (Unrecognized_token "-") tokenizer;
@@ -154,10 +154,10 @@ let rec scan (tokenizer : t) : Token_type.t option =
   | Some "0" ->
     (match peek tokenizer with
      | Some ("b" | "B") ->
-       advance tokenizer;
+       advance ~steps:1 tokenizer;
        tokenize_binary_literal tokenizer
      | Some ("x" | "X") ->
-       advance tokenizer;
+       advance ~steps:1 tokenizer;
        tokenize_hexadecimal_literal tokenizer
      | Some grapheme when Predicates.is_decimal_digit grapheme
        ->
