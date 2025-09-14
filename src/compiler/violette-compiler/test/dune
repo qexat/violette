@@ -1,6 +1,5 @@
 (test
  (name test_violette_compiler)
  (libraries ansifmt violette-ext violette-lambda-core violette-normal-form
-  violette-parser violette-repr violette-surface-lowering
-  violette-surface-term violette-token violette-token-type
-  violette-tokenizer))
+  violette-parser violette-repr violette-elaboration violette-surface-term
+  violette-token violette-token-type violette-tokenizer))

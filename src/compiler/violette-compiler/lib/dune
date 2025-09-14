@@ -3,5 +3,5 @@
  (name compiler)
  (libraries ansifmt violette-lambda-core violette-doctor violette-ext
   violette-file violette-normal-form violette-parser violette-repr
-  violette-surface-lowering violette-surface-term violette-token
+  violette-elaboration violette-surface-term violette-token
   violette-token-type violette-tokenizer))

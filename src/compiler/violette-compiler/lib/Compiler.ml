@@ -19,7 +19,7 @@ let to_lambda_core (compiler : t)
     Parser.create compiler.doctor compiler.file tokens
   in
   let*? expr = Parser.parse parser in
-  let term = Surface_lowering.lower expr in
+  let term = Elaboration.lower expr in
   Some (Artifact.Lambda_core term)
 
 let compile
