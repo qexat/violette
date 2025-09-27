@@ -1,4 +1,0 @@
-(test
- (name test_violette_toplevel)
- (libraries ansifmt violette-compiler violette-ext violette-file
-  violette-normal-form violette-repr violette-tree-walk-interpreter))

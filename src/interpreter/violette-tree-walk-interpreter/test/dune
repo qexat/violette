@@ -1,4 +1,0 @@
-(test
- (name test_violette_tree_walk_interpreter)
- (libraries ansifmt violette-lambda-core violette-diagnostic violette-doctor
-  violette-ext violette-file violette-normal-form violette-span))

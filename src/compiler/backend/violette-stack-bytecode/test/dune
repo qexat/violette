@@ -1,3 +1,0 @@
-(test
- (name test_violette_stack_bytecode)
- (libraries ansifmt violette-ext violette-repr))

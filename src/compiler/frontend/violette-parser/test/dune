@@ -1,5 +1,0 @@
-(test
- (name test_violette_parser)
- (libraries ansifmt violette-diagnostic violette-doctor violette-ext
-  violette-file violette-repr violette-surface-term violette-token
-  violette-token-type))

@@ -1,4 +1,0 @@
-(test
- (name test_violette_atomic_normalization)
- (libraries ansifmt violette-atomic-core violette-ext violette-lambda-core
-  violette-repr))

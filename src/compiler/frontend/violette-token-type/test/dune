@@ -1,3 +1,0 @@
-(test
- (name test_violette_token_type)
- (libraries ansifmt violette-ext violette-repr))
