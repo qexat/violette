@@ -1,4 +1,0 @@
-(library
- (public_name violette-elaboration)
- (name elaboration)
- (libraries violette-lambda-core violette-curry violette-surface-term))

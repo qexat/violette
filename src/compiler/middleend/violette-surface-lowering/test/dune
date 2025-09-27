@@ -1,3 +1,0 @@
-(test
- (name test_violette_lowering)
- (libraries violette-curry violette-lambda-core violette-surface-term))
