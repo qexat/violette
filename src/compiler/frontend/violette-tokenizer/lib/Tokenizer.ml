@@ -22,7 +22,7 @@ let create (doctor : Doctor.t) (file : File.t) : t =
 
 let repr
       { doctor = _; file; start; current; buffer = _; tokens }
-  : Fmt.t
+  : Better_fmt.t
   =
   Repr.record
     "Tokenizer"

@@ -1,4 +1,4 @@
 (library
  (public_name violette-stack-bytecode)
  (name stack_bytecode)
- (libraries ansifmt violette-ext violette-repr))
+ (libraries ansifmt violette-better-fmt violette-repr))

@@ -1,5 +1,3 @@
-open Ext
-
 type t =
   | Apply of t * t
   | Function of string * t
@@ -14,7 +12,7 @@ let apply (func : t) (arg : t) : t = Apply (func, arg)
 let ( @=> ) (param : string) (body : t) : t =
   Function (param, body)
 
-let rec repr : t -> Fmt.t = function
+let rec repr : t -> Better_fmt.t = function
   | Apply (func, arg) ->
     Repr.record
       "Apply"

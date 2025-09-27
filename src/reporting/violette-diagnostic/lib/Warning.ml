@@ -1,10 +1,8 @@
-open Ext
-
 type t = |
 
-let repr (_ : t) : Fmt.t = Repr.opaque "warning"
+let repr (_ : t) : Better_fmt.t = Repr.opaque "warning"
 
-let synopsis (warning : t) : Fmt.t =
+let synopsis (warning : t) : Better_fmt.t =
   match warning with
   | _ -> .
 

@@ -1,5 +1,3 @@
-open Ext
-
 type t =
   (* --- lexical analysis --- *)
   | Identifiers_cannot_start_with_underscore
@@ -17,9 +15,9 @@ type t =
   | Illegal_application of Lambda_core.t Normal_form.t
   | Unbound_variable of string
 
-let repr (_ : t) : Fmt.t = Repr.opaque "error"
+let repr (_ : t) : Better_fmt.t = Repr.opaque "error"
 
-let synopsis (error : t) : Fmt.t =
+let synopsis (error : t) : Better_fmt.t =
   match error with
   | Identifiers_cannot_start_with_underscore ->
     Repr.text "identifiers cannot start with an underscore"
@@ -29,29 +27,29 @@ let synopsis (error : t) : Fmt.t =
        leading zeros"
   | Unexpected_end_of_file -> Repr.text "unexpected end of file"
   | Unrecognized_token lexeme ->
-    Fmt.join
+    Better_fmt.join
       [ Repr.text "unrecognized token"; Repr.string lexeme ]
   | Expected_expression -> Repr.text "an expression is expected"
   | Expected_parameter_in_lambda ->
     Repr.text "expected a parameter for the function"
   | Expected_token token_type ->
-    Fmt.join
+    Better_fmt.join
       [ Repr.text "expected a token of the type"
       ; Token_type.repr token_type
       ]
   | Unexpected_token token ->
-    Fmt.join
+    Better_fmt.join
       [ Repr.text "unexpected token"; Token_type.repr token.ty ]
   | Unmatched_brace _ -> Repr.text "found an unmatched brace"
   | Unmatched_parenthesis _ ->
     Repr.text "found an unmatched parenthesis"
   | Illegal_application func ->
-    Fmt.join
+    Better_fmt.join
       [ Repr.text "illegal application of"
       ; Normal_form.repr func
       ]
   | Unbound_variable name ->
-    Fmt.join
+    Better_fmt.join
       [ Repr.text "variable"
       ; Repr.identifier name
       ; Repr.text "was not found in this scope"

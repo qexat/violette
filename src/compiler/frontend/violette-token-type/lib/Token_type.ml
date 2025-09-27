@@ -1,5 +1,3 @@
-open Ext
-
 type t =
   (* pairs *)
   | Brace_left (* { *)
@@ -19,7 +17,7 @@ type t =
   | Hexadecimal_numeric_literal
   | Semicolon
 
-let repr : t -> Fmt.t = function
+let repr : t -> Better_fmt.t = function
   | Brace_left -> Repr.punctuation "{"
   | Brace_right -> Repr.punctuation "}"
   | Paren_left -> Repr.punctuation "("

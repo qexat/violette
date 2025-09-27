@@ -1,0 +1,4 @@
+(library
+ (public_name violette-repr)
+ (name repr)
+ (libraries ansifmt violette-better-fmt violette-ext))

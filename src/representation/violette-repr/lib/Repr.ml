@@ -1,11 +1,10 @@
 open Ansifmt
 open Ansi
-open Ext
-open Fmt
+open Better_fmt
 
-let character_quote : Fmt.t = stylize (raw "'") `Dim
+let character_quote : Better_fmt.t = stylize (raw "'") `Dim
 
-let character (contents : string) : Fmt.t =
+let character (contents : string) : Better_fmt.t =
   stylize
     (concat
        [ character_quote
@@ -14,35 +13,35 @@ let character (contents : string) : Fmt.t =
        ])
     (`Foreground Color.cyan)
 
-let function_name (name : string) : Fmt.t =
+let function_name (name : string) : Better_fmt.t =
   stylize (raw name) (`Foreground Color.blue)
 
-let identifier (name : string) : Fmt.t = raw name
-let indent : Fmt.t = raw "  "
+let identifier (name : string) : Better_fmt.t = raw name
+let indent : Better_fmt.t = raw "  "
 
-let keyword (name : string) : Fmt.t =
+let keyword (name : string) : Better_fmt.t =
   stylize (raw name) (`Foreground Color.magenta & `Bold)
 
-let numeric (lexeme : string) : Fmt.t =
+let numeric (lexeme : string) : Better_fmt.t =
   stylize (raw lexeme) (`Foreground Color.cyan & `Italic)
 
-let opaque (name : string) : Fmt.t =
+let opaque (name : string) : Better_fmt.t =
   stylize
     (concat [ raw "<"; raw name; raw ">" ])
     (`Foreground Color.magenta)
 
-let operator (lexeme : string) : Fmt.t =
+let operator (lexeme : string) : Better_fmt.t =
   stylize (raw lexeme) (`Foreground Color.magenta)
 
-let parameter (name : string) : Fmt.t =
+let parameter (name : string) : Better_fmt.t =
   stylize (identifier name) `Italic
 
-let punctuation (lexeme : string) : Fmt.t =
+let punctuation (lexeme : string) : Better_fmt.t =
   stylize (raw lexeme) `Dim
 
-let string_quote : Fmt.t = stylize (raw "\"") `Dim
+let string_quote : Better_fmt.t = stylize (raw "\"") `Dim
 
-let string (contents : string) : Fmt.t =
+let string (contents : string) : Better_fmt.t =
   stylize
     (concat
        [ string_quote
@@ -51,15 +50,17 @@ let string (contents : string) : Fmt.t =
        ])
     (`Foreground Color.green)
 
-let text (contents : string) : Fmt.t = raw contents
+let text (contents : string) : Better_fmt.t = raw contents
 
-let type_name (name : string) : Fmt.t =
+let type_name (name : string) : Better_fmt.t =
   stylize (raw name) (`Foreground Color.yellow)
 
-let application (func : Fmt.t) (args : Fmt.t list) : Fmt.t =
+let application (func : Better_fmt.t) (args : Better_fmt.t list)
+  : Better_fmt.t
+  =
   join ~on:(raw " ") (func :: args)
 
-let block (expressions : Fmt.t list) : Fmt.t =
+let block (expressions : Better_fmt.t list) : Better_fmt.t =
   match expressions with
   | [] -> join [ punctuation "{"; punctuation "}" ]
   | first :: rest ->
@@ -73,7 +74,9 @@ let block (expressions : Fmt.t list) : Fmt.t =
       ; punctuation "}"
       ]
 
-let lambda (params : string list) (body : Fmt.t) : Fmt.t =
+let lambda (params : string list) (body : Better_fmt.t)
+  : Better_fmt.t
+  =
   keyword "\\"
   ++ join
        [ join (List.map parameter params); operator "->"; body ]
@@ -81,8 +84,8 @@ let lambda (params : string list) (body : Fmt.t) : Fmt.t =
 let let_definition
       (name : string)
       ?(params : string list = [])
-      (body : Fmt.t)
-  : Fmt.t
+      (body : Better_fmt.t)
+  : Better_fmt.t
   =
   join
     [ keyword "let"
@@ -93,27 +96,30 @@ let let_definition
 
 (* OCaml specific *)
 
-let int (value : int) : Fmt.t = numeric (Int.to_string value)
+let int (value : int) : Better_fmt.t =
+  numeric (Int.to_string value)
 
-let tuple (values : Fmt.t list) : Fmt.t =
+let tuple (values : Better_fmt.t list) : Better_fmt.t =
   concat
     [ punctuation "("
     ; join ~on:(concat [ punctuation ","; raw " " ]) values
     ; punctuation ")"
     ]
 
-let field_name (name : string) : Fmt.t =
+let field_name (name : string) : Better_fmt.t =
   stylize (raw name) (`Foreground Color.blue)
 
-let field (name : string) (value : Fmt.t) : Fmt.t =
+let field (name : string) (value : Better_fmt.t) : Better_fmt.t =
   join [ field_name name; operator "="; value ]
 
-let field_list (fields : (string * Fmt.t) list) : Fmt.t =
+let field_list (fields : (string * Better_fmt.t) list)
+  : Better_fmt.t
+  =
   fields
   |> List.map (fun (name, value) -> field name value)
   |> join ~on:(concat [ raw " "; punctuation ";"; raw " " ])
 
-let list_field (values : Fmt.t list) : Fmt.t =
+let list_field (values : Better_fmt.t list) : Better_fmt.t =
   match values with
   | [] -> punctuation "[]"
   | _ ->
@@ -126,8 +132,10 @@ let list_field (values : Fmt.t list) : Fmt.t =
       ; punctuation "]"
       ]
 
-let record (name : string) (fields : (string * Fmt.t) list)
-  : Fmt.t
+let record
+      (name : string)
+      (fields : (string * Better_fmt.t) list)
+  : Better_fmt.t
   =
   [ type_name name
   ; punctuation "{"
@@ -138,30 +146,36 @@ let record (name : string) (fields : (string * Fmt.t) list)
 
 (* diagnostic stuff *)
 
-let error (contents : string) : Fmt.t =
+let error (contents : string) : Better_fmt.t =
   stylize (raw contents) (`Foreground Color.red & `Bold)
 
-let warning (contents : string) : Fmt.t =
+let warning (contents : string) : Better_fmt.t =
   stylize (raw contents) (`Foreground Color.yellow & `Bold)
 
-let info (contents : string) : Fmt.t =
+let info (contents : string) : Better_fmt.t =
   stylize (raw contents) (`Foreground Color.blue & `Bold)
 
 (* bytecode *)
 
-let instruction (mnemonic : string) (args : Fmt.t list) : Fmt.t =
+let instruction (mnemonic : string) (args : Better_fmt.t list)
+  : Better_fmt.t
+  =
   let mnemonic_fmt = keyword mnemonic in
   match args with
   | [] -> mnemonic_fmt
   | last :: [] -> join ~on:(raw "\t") [ mnemonic_fmt; last ]
   | _ -> join ~on:(raw "\t") [ mnemonic_fmt; tuple args ]
 
-let section (name : string) (instructions : Fmt.t list) : Fmt.t =
+let section (name : string) (instructions : Better_fmt.t list)
+  : Better_fmt.t
+  =
   join
     ~on:(raw "\n" ++ indent)
     (function_name name :: instructions)
 
-let bytecode_directive ?(args : Fmt.t list = []) (name : string)
-  : Fmt.t
+let bytecode_directive
+      ?(args : Better_fmt.t list = [])
+      (name : string)
+  : Better_fmt.t
   =
   join (keyword ("@" ^ name) :: args)

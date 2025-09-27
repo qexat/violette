@@ -1,13 +1,11 @@
-open Ext
-
 type t =
   { decision : [ `Pass | `Abort ]
-  ; details : Fmt.t list
+  ; details : Better_fmt.t list
   }
 
 let create
       (decision : [ `Pass | `Abort ])
-      (details : Fmt.t list)
+      (details : Better_fmt.t list)
   : t
   =
   { decision; details }

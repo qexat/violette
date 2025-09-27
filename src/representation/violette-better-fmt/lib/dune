@@ -1,0 +1,4 @@
+(library
+ (public_name violette-better-fmt)
+ (name better_fmt)
+ (libraries ansifmt))

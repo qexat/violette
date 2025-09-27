@@ -22,4 +22,6 @@
   "violette-repr provides a representation model for all components of the Violette programming language and its implementation.")
  (depends
   (ocaml
-   (>= 5.3))))
+   (>= 5.3))
+  (ansifmt
+   (>= 1.0.0~pre2))))

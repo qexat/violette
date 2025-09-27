@@ -5,7 +5,7 @@ type 'term t =
   | Natural of int64
   | Unit
 
-let repr : type term. term t -> Fmt.t = function
+let repr : type term. term t -> Better_fmt.t = function
   | Closure _ -> Repr.opaque "fun"
   | Natural value -> Repr.numeric (Int64.to_string value)
   | Unit -> Repr.operator "()"
@@ -17,5 +17,5 @@ end
 module Make (T : TYPE) = struct
   type nonrec t = T.t t
 
-  let repr : t -> Fmt.t = repr
+  let repr : t -> Better_fmt.t = repr
 end

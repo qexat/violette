@@ -1,11 +1,9 @@
-open Ext
-
 type t =
   { line : int
   ; column : int
   }
 
-let repr { line; column } : Fmt.t =
+let repr { line; column } : Better_fmt.t =
   Repr.record
     "Position"
     [ ("line", Repr.int line); ("column", Repr.int column) ]

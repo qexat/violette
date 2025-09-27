@@ -4,11 +4,11 @@ open Ext
 type t =
   { doctor : Doctor.t
   ; mutable env : Lambda_core.t Normal_form.t Env.t
-  ; mutable prompt_in : Fmt.t
-  ; mutable prompt_out : Fmt.t
-  ; mutable prompt_err : Fmt.t
-  ; mutable banner_start : Fmt.t
-  ; mutable banner_end : Fmt.t (* config *)
+  ; mutable prompt_in : Better_fmt.t
+  ; mutable prompt_out : Better_fmt.t
+  ; mutable prompt_err : Better_fmt.t
+  ; mutable banner_start : Better_fmt.t
+  ; mutable banner_end : Better_fmt.t (* config *)
   ; mutable show_styling : [ `Auto | `Always | `Never ]
   }
 
@@ -19,17 +19,17 @@ type state =
 
 module Defaults = struct
   open Ansi
-  open Fmt
+  open Better_fmt
 
-  let prompt_in : Fmt.t = stylize (raw "<<<") `Bold
+  let prompt_in : Better_fmt.t = stylize (raw "<<<") `Bold
 
-  let prompt_out : Fmt.t =
+  let prompt_out : Better_fmt.t =
     stylize (raw ">>>") (`Foreground Color.blue & `Bold)
 
-  let prompt_err : Fmt.t =
+  let prompt_err : Better_fmt.t =
     stylize (raw ">>>") (`Foreground Color.red & `Bold)
 
-  let banner_start : Fmt.t =
+  let banner_start : Better_fmt.t =
     join
       ~on:(raw " ")
       [ stylize
@@ -41,7 +41,7 @@ module Defaults = struct
       ; raw "to quit"
       ]
 
-  let banner_end : Fmt.t =
+  let banner_end : Better_fmt.t =
     stylize (raw "Goodbye!") (`Foreground Color.yellow)
 end
 
@@ -81,7 +81,7 @@ let repr
       ; banner_end
       ; show_styling = _
       }
-  : Fmt.t
+  : Better_fmt.t
   =
   Repr.record
     "Toplevel"
@@ -103,7 +103,7 @@ let get_prompt
       (state : state)
       (channel_type : [ `Out | `Err ])
       (toplevel : t)
-  : Fmt.t
+  : Better_fmt.t
   =
   match state with
   | `Listening -> toplevel.prompt_in
@@ -119,7 +119,7 @@ let print_prompt
   =
   let prompt = get_prompt state channel_type toplevel in
   let out = get_channel channel_type in
-  Fmt.print ~out ~ending:(Some " ") prompt
+  Better_fmt.print ~out ~ending:(Some " ") prompt
 
 let listen (toplevel : t) : string option =
   print_prompt ~state:`Listening `Out toplevel;
@@ -131,12 +131,12 @@ let listen (toplevel : t) : string option =
 
 let respond
       ?(channel_type = `Out)
-      (message : Fmt.t)
+      (message : Better_fmt.t)
       (toplevel : t)
   =
   print_prompt ~state:`Responding channel_type toplevel;
   let out = get_channel channel_type in
-  Fmt.print ~out message
+  Better_fmt.print ~out message
 
 let print_value
       (value : Lambda_core.t Normal_form.t)
@@ -149,7 +149,7 @@ let report_errors (toplevel : t) : unit =
   let review = Doctor.review ~mode:`Toplevel toplevel.doctor in
   let out = get_channel `Err in
   List.iter
-    (fun diagnostic -> Fmt.print ~out diagnostic)
+    (fun diagnostic -> Better_fmt.print ~out diagnostic)
     review.details
 
 let compile (file : File.t) (toplevel : t)
@@ -178,7 +178,7 @@ let eval (source : string) (toplevel : t)
 
 let setup (toplevel : t) : unit =
   Out_channel.set_buffered stderr false;
-  Fmt.print toplevel.banner_start
+  Better_fmt.print toplevel.banner_start
 
 let rec loop (toplevel : t) =
   match listen toplevel with
@@ -191,7 +191,7 @@ let rec loop (toplevel : t) =
     loop toplevel
 
 let teardown (toplevel : t) =
-  Fmt.print toplevel.banner_end;
+  Better_fmt.print toplevel.banner_end;
   Out_channel.set_buffered stderr true
 
 let run (toplevel : t) =

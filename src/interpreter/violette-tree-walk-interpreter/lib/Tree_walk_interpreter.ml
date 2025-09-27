@@ -20,7 +20,7 @@ let fork
     interpreter.doctor
     interpreter.file
 
-let repr (interpreter : t) : Fmt.t =
+let repr (interpreter : t) : Better_fmt.t =
   Repr.record
     "Interpreter"
     [ ("file", File.repr interpreter.file)

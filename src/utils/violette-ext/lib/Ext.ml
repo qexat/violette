@@ -13,4 +13,3 @@ let make_dummy_identifier_generator ~(prefix : string) =
   fun () -> Printf.sprintf "$%s:%d" prefix (make_index ())
 
 module Env = Env
-module Fmt = Fmt

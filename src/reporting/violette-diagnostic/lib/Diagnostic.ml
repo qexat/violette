@@ -1,6 +1,3 @@
-open Ext
-open Fmt
-
 type t =
   { diagnosis : Diagnosis.t
   ; span : Span.t
@@ -12,7 +9,7 @@ let create (diagnosis : Diagnosis.t) (span : Span.t) : t =
 let render_parts (diagnostic : t) : Rendered_parts.t =
   { header = Diagnosis.header diagnostic.diagnosis
   ; file_metadata =
-      join
+      Better_fmt.join
         [ Repr.indent
         ; Repr.keyword "in"
         ; Repr.string diagnostic.span.file.path
@@ -25,8 +22,9 @@ let render_parts (diagnostic : t) : Rendered_parts.t =
       |> List.map Diagnosis.header
   }
 
-let render ~(mode : Mode.t) (diagnostic : t) : Fmt.t =
-  join_lines (Mode.select_parts mode (render_parts diagnostic))
+let render ~(mode : Mode.t) (diagnostic : t) : Better_fmt.t =
+  Better_fmt.join_lines
+    (Mode.select_parts mode (render_parts diagnostic))
 
 module Rendered_parts = Rendered_parts
 module Mode = Mode

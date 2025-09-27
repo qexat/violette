@@ -32,7 +32,7 @@ let repr
       ; brace_stack = _
       ; paren_stack = _
       }
-  : Fmt.t
+  : Better_fmt.t
   =
   Repr.record
     "Parser"

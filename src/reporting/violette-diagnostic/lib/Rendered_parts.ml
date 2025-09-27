@@ -1,8 +1,6 @@
-open Ext
-
 type t =
-  { header : Fmt.t
-  ; file_metadata : Fmt.t
-  ; contextual_code : Fmt.t
-  ; notes : Fmt.t list
+  { header : Better_fmt.t
+  ; file_metadata : Better_fmt.t
+  ; contextual_code : Better_fmt.t
+  ; notes : Better_fmt.t list
   }

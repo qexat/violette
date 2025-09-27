@@ -1,5 +1,3 @@
-open Ext
-
 type t =
   | Push of Value.t
   | Call
@@ -7,7 +5,7 @@ type t =
   | Store of string
   | Return
 
-let repr : t -> Fmt.t = function
+let repr : t -> Better_fmt.t = function
   | Push value -> Repr.instruction "PUSH" [ Value.repr value ]
   | Call -> Repr.instruction "CALL" []
   | Load name ->

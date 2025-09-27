@@ -1,12 +1,10 @@
-open Ext
-
 type t =
   { file : File.t
   ; start_position : Position.t
   ; end_position : Position.t
   }
 
-let repr { file; start_position; end_position } : Fmt.t =
+let repr { file; start_position; end_position } : Better_fmt.t =
   Repr.record
     "Span"
     [ ("file", File.repr file)

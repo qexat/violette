@@ -1,5 +1,3 @@
-open Ext
-
 type expr =
   (* sorting: by precedence then lexicographically *)
   | Natural of int64
@@ -10,7 +8,7 @@ type expr =
   | Function of string list * expr
   | Let of string * string list * expr
 
-let rec repr : expr -> Fmt.t = function
+let rec repr : expr -> Better_fmt.t = function
   | Natural value -> Repr.numeric (Int64.to_string value)
   | Unit -> Repr.tuple []
   | Variable name -> Repr.identifier name

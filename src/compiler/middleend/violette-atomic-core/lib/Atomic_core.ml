@@ -1,5 +1,3 @@
-open Ext
-
 type t =
   | Atom of atom
   | Let of string * atom * t
@@ -11,7 +9,7 @@ and atom =
   | Variable of string
   | Function of string * t
 
-let rec repr : t -> Fmt.t = function
+let rec repr : t -> Better_fmt.t = function
   | Atom atom -> repr_atom atom
   | Let (name, body, block) ->
     Repr.record
@@ -29,7 +27,7 @@ let rec repr : t -> Fmt.t = function
       ; ("next", repr block)
       ]
 
-and repr_atom : atom -> Fmt.t = function
+and repr_atom : atom -> Better_fmt.t = function
   | Natural value ->
     Repr.record
       "Natural"

@@ -12,6 +12,7 @@ bug-reports: "https://github.com/qexat/violette/issues"
 depends: [
   "dune" {>= "3.20"}
   "ocaml" {>= "5.3"}
+  "ansifmt" {>= "1.0.0~pre2"}
   "odoc" {with-doc}
 ]
 build: [

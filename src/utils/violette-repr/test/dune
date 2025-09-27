@@ -1,3 +1,0 @@
-(test
- (name test_violette_repr)
- (libraries ansifmt violette-ext))

@@ -1,10 +1,8 @@
-open Ext
-
 type t = Leading_underscores_are_reserved
 
-let repr (_ : t) : Fmt.t = Repr.opaque "info"
+let repr (_ : t) : Better_fmt.t = Repr.opaque "info"
 
-let synopsis (info : t) : Fmt.t =
+let synopsis (info : t) : Better_fmt.t =
   match info with
   | Leading_underscores_are_reserved ->
     Repr.text
