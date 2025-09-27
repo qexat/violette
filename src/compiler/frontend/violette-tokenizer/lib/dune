@@ -1,6 +1,6 @@
 (library
  (public_name violette-tokenizer)
  (name tokenizer)
- (libraries ansifmt violette-diagnostic violette-doctor violette-ext
-  violette-file violette-repr violette-span violette-token
+ (libraries ansifmt violette-better-fmt violette-diagnostic violette-doctor
+  violette-ext violette-file violette-repr violette-span violette-token
   violette-token-type))

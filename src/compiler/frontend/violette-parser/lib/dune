@@ -1,6 +1,6 @@
 (library
  (public_name violette-parser)
  (name parser)
- (libraries ansifmt violette-diagnostic violette-doctor violette-ext
-  violette-file violette-repr violette-surface-term violette-token
-  violette-token-type))
+ (libraries ansifmt violette-better-fmt violette-diagnostic violette-doctor
+  violette-ext violette-file violette-repr violette-surface-term
+  violette-token violette-token-type))
