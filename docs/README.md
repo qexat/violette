@@ -19,3 +19,9 @@ dune exec violette toplevel
 ## Publications
 
 - [My plans for Violette](https://qexat.bearblog.dev/plans-for-violette/)
+
+---
+
+Violette's development does not involve any large language model.
+
+[![Violette is entirely brain-made.](https://brainmade.org/black-logo.svg)](https://brainmade.org)
